@@ -22,8 +22,8 @@ XWMHints *wm_hints;
 XClassHint *class_hints;
 XSizeHints *size_hints;
 XTextProperty win_name, icon_name;
-char *win_name_string = "Example Window";
-char *icon_name_string = "Icon for Example Window";
+char *win_name_string = (char*)"Example Window";
+char *icon_name_string = (char*)"Icon for Example Window";
 
 XEvent report;
 
@@ -32,6 +32,52 @@ unsigned long valuemask = 0;
 XGCValues gc_values, gc_yellow_values, gc_red_values, gc_grey_values;
 Colormap color_map;
 XColor tmp_color1, tmp_color2;
+
+
+
+
+/* custom functions */
+struct Point
+{
+    int x, y;
+};
+
+
+void createGrid(int gridLength, int cellSize ){
+    for (int i=0; i<=gridLength; i = i+cellSize)
+      {
+            XDrawLine(display_ptr, win, gc, 0, i * win_height/gridLength,
+                win_width, i * win_height/gridLength);
+            XDrawLine(display_ptr, win, gc, i * win_width/gridLength, 0,
+                i * win_width/gridLength, win_height);
+
+      }
+}
+
+void createObstacles(Point point1, Point point2, Point point3){
+    XDrawLine(display_ptr, win, gc_red, point1.x, point1.y,
+                point2.x, point2.y);
+
+    XDrawLine(display_ptr, win, gc_red, point2.x, point2.y,
+                point3.x, point3.y);
+    
+    XDrawLine(display_ptr, win, gc_red, point3.x, point3.y,
+                point1.x, point1.y);
+}
+
+void createRobot(Point point1, Point point2, Point point3){
+    XDrawLine(display_ptr, win, gc_yellow, point1.x, point1.y,
+                point2.x, point2.y);
+
+    XDrawLine(display_ptr, win, gc_yellow, point2.x, point2.y,
+                point3.x, point3.y);
+    
+    XDrawLine(display_ptr, win, gc_yellow, point3.x, point3.y,
+                point1.x, point1.y);
+}
+
+
+
 
 int main(int argc, char **argv)
 {
@@ -82,8 +128,8 @@ int main(int argc, char **argv)
   wm_hints->initial_state = NormalState;
   wm_hints->input = False;
 
-  class_hints->res_name = "x_use_example";
-  class_hints->res_class = "examples";
+  class_hints->res_name = (char*)"x_use_example";
+  class_hints->res_class = (char*)"examples";
 
   XSetWMProperties(display_ptr, win, &win_name, &icon_name, argv, argc,
                    size_hints, wm_hints, class_hints);
@@ -139,10 +185,22 @@ int main(int argc, char **argv)
     switch (report.type)
     {
     case Expose:
+    {
       /* (re-)draw the example figure. This event happens
 			 each time some part ofthe window gets exposed (becomes visible) */
-      XDrawLine(display_ptr, win, gc, 500, 0,
-                500, 100);
+
+      createGrid(500, 5);
+      Point point1 = {100, 100};
+      Point point2 = {100, 130};
+      Point point3 = {150, 110};
+      createObstacles(point1, point2, point3);
+      
+      Point point1R = {200, 200};
+      Point point2R = {200, 230};
+      Point point3R = {250, 210};
+      createRobot(point1R, point2R, point3R);
+      
+     /*              
       XDrawLine(display_ptr, win, gc_red, win_width / 4, 2 * win_height / 3,
                 3 * win_width / 4, 2 * win_height / 3);
       XFillArc(display_ptr, win, gc_grey, win_width / 2 - win_height / 6,
@@ -150,7 +208,8 @@ int main(int argc, char **argv)
                win_height / 3, win_height / 3, 0, 360 * 64);
       XDrawArc(display_ptr, win, gc_yellow, win_width / 4, win_height / 3,
                win_height / 6, win_height / 3, 90 * 64, 180 * 64);
-
+     */
+    }
       break;
     case ConfigureNotify:
       /* This event happens when the user changes the size of the window*/
