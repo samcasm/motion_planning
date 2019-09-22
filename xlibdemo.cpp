@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include "helpers.h"
+#include <iostream>
+using namespace std;
 
 Display *display_ptr;
 Screen *screen_ptr;
@@ -34,14 +37,7 @@ Colormap color_map;
 XColor tmp_color1, tmp_color2;
 
 
-
-
-/* custom functions */
-struct Point
-{
-    int x, y;
-};
-
+/* custom xlib functions */
 
 void createGrid(int gridLength, int cellSize ){
     for (int i=0; i<=gridLength; i = i+cellSize)
@@ -76,6 +72,12 @@ void createRobot(Point point1, Point point2, Point point3){
                 point1.x, point1.y);
 }
 
+int computeNewX_Y(Point point, int deg, char selection){
+  if (selection == 'x'){
+    return ( ((point.x * 5) * cos(deg)) - ((point.y * 5) * sin(deg)) ) + (point.x  * 5);
+  }
+  return ( ((point.x * 5) * sin(deg)) + ((point.y) * cos(deg)) ) + (point.y * 5);
+}
 
 
 
@@ -199,6 +201,46 @@ int main(int argc, char **argv)
       Point point2R = {200, 230};
       Point point3R = {250, 210};
       createRobot(point1R, point2R, point3R);
+
+      /* TESTS
+      struct Point e1 = {10,60};
+      struct Point c1 = {0,0};
+      struct Point c2 = {20,0};
+      struct Point c3 = {10,30};
+      pointInTriangle(e1, c1,c2,c3)? cout << "Inside\n" : cout << "Not inside\n";
+      
+      struct Point p1 = {1, 1}, q1 = {10, 1}; 
+      struct Point p2 = {1, 2}, q2 = {10, 2}; 
+    
+      doIntersect(p1, q1, p2, q2)? cout << "Yes\n": cout << "No\n"; 
+    
+      p1 = {10, 0}, q1 = {0, 10}; 
+      p2 = {0, 0}, q2 = {10, 10}; 
+      doIntersect(p1, q1, p2, q2)? cout << "Yes\n": cout << "No\n"; 
+      p1 = {-5, -5}, q1 = {0, 0}; 
+      p2 = {1, 1}, q2 = {10, 10}; 
+      doIntersect(p1, q1, p2, q2)? cout << "Yes\n": cout << "No\n"; 
+
+      */
+      int freeSpace[100][100][36]; 
+      struct Point origin1 = {-6,-3}, origin2 = {-6,3}, origin3 = {10, 0};
+      for (int i= 0; i<100; i++){
+        for (int j=0; j<100; j++ ){
+          for (int k=0; k<36; k++){
+            int deg = 10 * k;
+            int new_x1 = computeNewX_Y(origin1, deg, 'x');
+            int new_y1 = computeNewX_Y(origin1, deg, 'y');
+
+            int new_x2 = computeNewX_Y(origin2, deg, 'x');
+            int new_y2 = computeNewX_Y(origin2, deg, 'y');
+
+            int new_x3 = computeNewX_Y(origin3, deg, 'x');
+            int new_y3 = computeNewX_Y(origin3, deg, 'y');
+
+          }
+        }
+      }
+
       
      /*              
       XDrawLine(display_ptr, win, gc_red, win_width / 4, 2 * win_height / 3,
