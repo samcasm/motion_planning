@@ -72,13 +72,6 @@ void createRobot(Point point1, Point point2, Point point3){
                 point1.x, point1.y);
 }
 
-int computeNewX_Y(Point point, int deg, char selection){
-  if (selection == 'x'){
-    return ( ((point.x * 5) * cos(deg)) - ((point.y * 5) * sin(deg)) ) + (point.x  * 5);
-  }
-  return ( ((point.x * 5) * sin(deg)) + ((point.y) * cos(deg)) ) + (point.y * 5);
-}
-
 
 
 int main(int argc, char **argv)
@@ -222,21 +215,65 @@ int main(int argc, char **argv)
       doIntersect(p1, q1, p2, q2)? cout << "Yes\n": cout << "No\n"; 
 
       */
-      int freeSpace[100][100][36]; 
-      struct Point origin1 = {-6,-3}, origin2 = {-6,3}, origin3 = {10, 0};
-      for (int i= 0; i<100; i++){
-        for (int j=0; j<100; j++ ){
-          for (int k=0; k<36; k++){
+      int gridSize = 100;
+      int cellSize = 5;
+      int degrees = 36;
+
+      int freeSpace[gridSize][gridSize][degrees]; 
+      struct Point origin={0,0}, origin1 = {-6,-3}, origin2 = {-6,3}, origin3 = {10, 0};
+      struct Point temp, temp1, temp2, temp3;
+      /*obstacles*/
+      struct Point obs1_v1={100,100}, obs1_v2={100,130}, obs1_v3={150,110};
+      struct Triangle obstacle1 = {obs1_v1,obs1_v2,obs1_v3};
+      struct Triangle obstacles[1];
+      obstacles[0] = obstacle1;
+
+
+
+      for (int i= 0; i<gridSize; i++){
+        for (int j=0; j<gridSize; j++ ){
+          for (int k=0; k<degrees; k++){
             int deg = 10 * k;
-            int new_x1 = computeNewX_Y(origin1, deg, 'x');
-            int new_y1 = computeNewX_Y(origin1, deg, 'y');
 
-            int new_x2 = computeNewX_Y(origin2, deg, 'x');
-            int new_y2 = computeNewX_Y(origin2, deg, 'y');
+            if (deg == 0){
 
-            int new_x3 = computeNewX_Y(origin3, deg, 'x');
-            int new_y3 = computeNewX_Y(origin3, deg, 'y');
+              origin1.x = computeNewX_Y(j*5, deg, 'x');
+              origin1.y = computeNewX_Y(i*5, deg, 'y');
 
+              origin2.x = computeNewX_Y(j*5, deg, 'x');
+              origin2.y = computeNewX_Y(i*5, deg, 'y');
+
+              origin3.x = computeNewX_Y(j*5, deg, 'x');
+              origin3.y = computeNewX_Y(i*5, deg, 'y');
+            }
+            /* compute projection of rotation and translation */
+            temp.x = computeNewX_Y(origin.x * 5, deg, 'x');
+            temp.y = computeNewX_Y(origin.y * 5, deg, 'y');
+
+            temp1.x = computeNewX_Y(origin1.x * 5, deg, 'x');
+            temp1.y = computeNewX_Y(origin1.y * 5, deg, 'y');
+
+            temp2.x = computeNewX_Y(origin2.x * 5, deg, 'x');
+            temp2.y = computeNewX_Y(origin2.y * 5, deg, 'y');
+
+            temp3.x = computeNewX_Y(origin3.x * 5, deg, 'x');
+            temp3.y = computeNewX_Y(origin3.y * 5, deg, 'y');
+
+            /* check bounding condition */
+            if (temp.x < 0 || temp.x > gridSize || temp.y < 0 || temp.y > gridSize){
+              freeSpace[i][j][k] = 0;
+              break;
+            }
+
+            /* check obstacle collision */
+            if (isCollidingWithObstacle(temp1, temp2, temp3, obstacles, sizeof(obstacles))){
+              freeSpace[i][j][k] = 0;
+              break;
+            }else{
+              freeSpace[i][j][k] = 1;
+              break;
+            }
+  
           }
         }
       }

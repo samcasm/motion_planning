@@ -1,4 +1,5 @@
 #include <iostream>
+#include <math.h>
 #include "helpers.h"
 using namespace std;
 
@@ -60,4 +61,46 @@ bool pointInTriangle(Point x, Point a, Point b, Point c){
     int or3 = orientation(x, c, a);
 
     return or1 == or2 ? (or2 == or3 ? true : false) : false ;
+}
+
+int computeNewX_Y(int x_y, int deg, char selection){
+  if (selection == 'x'){
+    return ( ((x_y * 5) * cos(deg)) - ((x_y * 5) * sin(deg)) ) + (x_y  * 5);
+  }
+  return ( ((x_y * 5) * sin(deg)) + ((x_y) * cos(deg)) ) + (x_y * 5);
+}
+
+bool isCollidingWithObstacle(Point x, Point y, Point z, Triangle *obstacles, int noOfObstacles){
+  struct Triangle triangle1 = {x, y, z};
+  for (int i=0; i<noOfObstacles; i++){
+    Triangle obstacle =  obstacles[i];
+
+    if (doIntersect(triangle1.x, triangle1.y, obstacle.x, obstacle.y)) return true;
+    if (doIntersect(triangle1.x, triangle1.y, obstacle.x, obstacle.z)) return true;
+    if (doIntersect(triangle1.x, triangle1.y, obstacle.y, obstacle.z)) return true;
+    if (doIntersect(triangle1.x, triangle1.z, obstacle.x, obstacle.y)) return true;
+    if (doIntersect(triangle1.x, triangle1.z, obstacle.x, obstacle.z)) return true;
+    if (doIntersect(triangle1.x, triangle1.z, obstacle.y, obstacle.z)) return true;
+    if (doIntersect(triangle1.y, triangle1.z, obstacle.x, obstacle.y)) return true;
+    if (doIntersect(triangle1.y, triangle1.z, obstacle.x, obstacle.z)) return true;
+    if (doIntersect(triangle1.y, triangle1.z, obstacle.y, obstacle.z)) return true;
+
+    int inTriangle = true;
+
+    inTriangle = inTriangle && pointInTriangle(triangle1.x, obstacle.x, obstacle.y, obstacle.z);
+    inTriangle = inTriangle && pointInTriangle(triangle1.y, obstacle.x, obstacle.y, obstacle.z);
+    inTriangle = inTriangle && pointInTriangle(triangle1.z, obstacle.x, obstacle.y, obstacle.z);
+
+    if (inTriangle == true) return true;
+
+    inTriangle = true;
+
+    inTriangle = inTriangle && pointInTriangle(obstacle.x, triangle1.x, triangle1.y, triangle1.z);
+    inTriangle = inTriangle && pointInTriangle(obstacle.y, triangle1.x, triangle1.y, triangle1.z);
+    inTriangle = inTriangle && pointInTriangle(obstacle.z, triangle1.x, triangle1.y, triangle1.z);
+
+    if (inTriangle == true) return true;
+
+  } 
+  return false;
 }
