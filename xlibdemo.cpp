@@ -12,8 +12,11 @@
 #include <stdlib.h>
 #include "helpers.h"
 #include <iostream>
-#include <string>
+#include <complex>
+#include <bits/stdc++.h>
 using namespace std;
+
+#define PI 3.14159265
 
 Display *display_ptr;
 Screen *screen_ptr;
@@ -54,16 +57,17 @@ void createGrid(int gridLength, int cellSize)
   }
 }
 
-void createObstacles(Point point1, Point point2, Point point3)
+void createTriangles(Point point1, Point point2, Point point3, int gridLength, int type)
 {
-  XDrawLine(display_ptr, win, gc_red, point1.x, point1.y,
-            point2.x, point2.y);
+  /* type == 1 for obstacles(red), else 0(yellow) */ 
+  XDrawLine(display_ptr, win, type == 1? gc_red: gc_yellow, point1.x * win_width / gridLength, point1.y * win_height / gridLength,
+            point2.x * win_width / gridLength, point2.y * win_height / gridLength);
 
-  XDrawLine(display_ptr, win, gc_red, point2.x, point2.y,
-            point3.x, point3.y);
+  XDrawLine(display_ptr, win, type == 1? gc_red: gc_yellow, point2.x * win_width / gridLength, point2.y * win_height / gridLength,
+            point3.x * win_width / gridLength, point3.y * win_height / gridLength);
 
-  XDrawLine(display_ptr, win, gc_red, point3.x, point3.y,
-            point1.x, point1.y);
+  XDrawLine(display_ptr, win, type == 1? gc_red: gc_yellow, point3.x * win_width / gridLength, point3.y * win_height / gridLength,
+            point1.x * win_width / gridLength, point1.y * win_height / gridLength);
 }
 
 void createRobot(Point point1, Point point2, Point point3)
@@ -78,18 +82,27 @@ void createRobot(Point point1, Point point2, Point point3)
             point1.x, point1.y);
 }
 
-void rotatePoint(int x, int y, int deg){
-  int x1 = (x * cos(deg)) - (y * sin(deg));
-  int y1 = (y * cos(deg)) + (x * sin(deg));
+float degreeToRadian(int deg){
 
-  struct Point point1 = {x1, y1};
+  return deg * PI / 180.0;
+}
 
-  cout << point1.x << point1.y << "Here we are" << "\n";
+Point rotate_trans_Point(Point P, int x, int y, int deg){
+  int rotx = (P.x * cos(degreeToRadian(deg))) - (P.y * sin(degreeToRadian(deg)));
+  int roty = (P.x * sin(degreeToRadian(deg))) + (P.y * cos(degreeToRadian(deg)));
+  
+  int x1 = x * 5;
+  int y1 = y * 5;
+
+  int resx = rotx + x1;
+  int resy = roty + y1;
+  
+  struct Point newpoint = {resx, resy};
+  return newpoint;
 }
 
 int main(int argc, char **argv)
 {
-  rotatePoint(2,1,90);
 
   /* TESTS
       struct Point e1 = {10,60};
@@ -111,19 +124,17 @@ int main(int argc, char **argv)
       doIntersect(p1, q1, p2, q2)? cout << "Yes\n": cout << "No\n"; 
 
       */
-  int gridSize = 4;
+  int gridSize = 100;
   int cellSize = 5;
   int degrees = 36;
 
   int freeSpace[gridSize][gridSize][degrees];
-  struct Point origin = {0, 0}, origin1 = {-3, 0}, origin2 = {0, -3}, origin3 = {3, 3};
+  struct Point origin = {0, 0}, origin1 = {-6, -3}, origin2 = {-6, 3}, origin3 = {10, 0};
   struct Point temp, temp1, temp2, temp3;
   /*obstacles*/
-  struct Point obs1_v1 = {20, 20}, obs1_v2 = {15, 17}, obs1_v3 = {20, 15};
-  struct Point obs2_v1 = {200, 200}, obs2_v2 = {200, 230}, obs2_v3 = {250, 210};
+  struct Point obs1_v1 = {100, 100}, obs1_v2 = {100, 130}, obs1_v3 = {150, 110};
   struct Triangle obstacle1 = {obs1_v1, obs1_v2, obs1_v3};
-  struct Triangle obstacle2 = {obs2_v1, obs2_v2, obs2_v3};
-  struct Triangle obstacles[2] = {obstacle1};
+  struct Triangle obstacles[1] = {obstacle1};
 
   int noOfObstacles = sizeof(obstacles)/sizeof(obstacles[0]);
   
@@ -136,27 +147,23 @@ int main(int argc, char **argv)
         int deg = 10 * k;
 
         /* compute projection of rotation and translation */
-        temp.x = computeNewX_Y(origin.x * j * 5, deg, 'x');
-        temp.y = computeNewX_Y(origin.y * i * 5, deg, 'y');
+        temp = rotate_trans_Point(origin, j, i, 0);
 
-        temp1.x = computeNewX_Y(origin1.x * j * 5, deg, 'x');
-        temp1.y = computeNewX_Y(origin1.y * i * 5, deg, 'y');
+        temp1 = rotate_trans_Point(origin1, j, i, deg);
 
-        temp2.x = computeNewX_Y(origin2.x * j * 5, deg, 'x');
-        temp2.y = computeNewX_Y(origin2.y * i * 5, deg, 'y');
+        temp2 = rotate_trans_Point(origin2,j ,i, deg);
 
-        temp3.x = computeNewX_Y(origin3.x * j * 5, deg, 'x');
-        temp3.y = computeNewX_Y(origin3.y * i * 5, deg, 'y');
-        
+        temp3= rotate_trans_Point(origin3, j ,i, deg);
         
         /* check bounding condition */
         if (temp.x < 0 || temp.x > (gridSize*5) || temp.y < 0 || temp.y > (gridSize*5))
         {
           freeSpace[i][j][k] = 0;
+          break;
         }
         /* check obstacle collision */
         else if (isCollidingWithObstacle(temp1, temp2, temp3, obstacles, noOfObstacles))
-        {
+        { 
           freeSpace[i][j][k] = 0;
         }
         else
@@ -278,16 +285,10 @@ int main(int argc, char **argv)
       /* (re-)draw the example figure. This event happens
 			 each time some part ofthe window gets exposed (becomes visible) */
 
-      createGrid(500, 5);
-      Point point1 = {100, 100};
-      Point point2 = {100, 130};
-      Point point3 = {150, 110};
-      createObstacles(point1, point2, point3);
+      createGrid(gridSize * cellSize, cellSize);
+      createTriangles(obs1_v1, obs1_v2, obs1_v3, gridSize * cellSize, 1);
 
-      Point point1R = {200, 200};
-      Point point2R = {200, 230};
-      Point point3R = {250, 210};
-      createRobot(point1R, point2R, point3R);
+      createTriangles(origin1, origin2, origin3, gridSize * cellSize, 0);
 
       /*              
       XDrawLine(display_ptr, win, gc_red, win_width / 4, 2 * win_height / 3,
