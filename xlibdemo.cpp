@@ -1,4 +1,8 @@
-/* compiles with command line  gcc xlibdemo.c -lX11 -lm -L/usr/X11R6/lib */
+/* compiles with command line  gcc xlibdemo.c -lX11 -lm -L/usr/X11R6/lib 
+   sudo apt install g++
+   sudo apt install libx11-dev
+   install c/c++ intellisense extension 
+*/
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
@@ -8,6 +12,7 @@
 #include <stdlib.h>
 #include "helpers.h"
 #include <iostream>
+#include <string>
 using namespace std;
 
 Display *display_ptr;
@@ -25,8 +30,8 @@ XWMHints *wm_hints;
 XClassHint *class_hints;
 XSizeHints *size_hints;
 XTextProperty win_name, icon_name;
-char *win_name_string = (char*)"Example Window";
-char *icon_name_string = (char*)"Icon for Example Window";
+char *win_name_string = (char *)"Example Window";
+char *icon_name_string = (char *)"Icon for Example Window";
 
 XEvent report;
 
@@ -36,46 +41,135 @@ XGCValues gc_values, gc_yellow_values, gc_red_values, gc_grey_values;
 Colormap color_map;
 XColor tmp_color1, tmp_color2;
 
-
 /* custom xlib functions */
 
-void createGrid(int gridLength, int cellSize ){
-    for (int i=0; i<=gridLength; i = i+cellSize)
-      {
-            XDrawLine(display_ptr, win, gc, 0, i * win_height/gridLength,
-                win_width, i * win_height/gridLength);
-            XDrawLine(display_ptr, win, gc, i * win_width/gridLength, 0,
-                i * win_width/gridLength, win_height);
-
-      }
+void createGrid(int gridLength, int cellSize)
+{
+  for (int i = 0; i <= gridLength; i = i + cellSize)
+  {
+    XDrawLine(display_ptr, win, gc, 0, i * win_height / gridLength,
+              win_width, i * win_height / gridLength);
+    XDrawLine(display_ptr, win, gc, i * win_width / gridLength, 0,
+              i * win_width / gridLength, win_height);
+  }
 }
 
-void createObstacles(Point point1, Point point2, Point point3){
-    XDrawLine(display_ptr, win, gc_red, point1.x, point1.y,
-                point2.x, point2.y);
+void createObstacles(Point point1, Point point2, Point point3)
+{
+  XDrawLine(display_ptr, win, gc_red, point1.x, point1.y,
+            point2.x, point2.y);
 
-    XDrawLine(display_ptr, win, gc_red, point2.x, point2.y,
-                point3.x, point3.y);
-    
-    XDrawLine(display_ptr, win, gc_red, point3.x, point3.y,
-                point1.x, point1.y);
+  XDrawLine(display_ptr, win, gc_red, point2.x, point2.y,
+            point3.x, point3.y);
+
+  XDrawLine(display_ptr, win, gc_red, point3.x, point3.y,
+            point1.x, point1.y);
 }
 
-void createRobot(Point point1, Point point2, Point point3){
-    XDrawLine(display_ptr, win, gc_yellow, point1.x, point1.y,
-                point2.x, point2.y);
+void createRobot(Point point1, Point point2, Point point3)
+{
+  XDrawLine(display_ptr, win, gc_yellow, point1.x, point1.y,
+            point2.x, point2.y);
 
-    XDrawLine(display_ptr, win, gc_yellow, point2.x, point2.y,
-                point3.x, point3.y);
-    
-    XDrawLine(display_ptr, win, gc_yellow, point3.x, point3.y,
-                point1.x, point1.y);
+  XDrawLine(display_ptr, win, gc_yellow, point2.x, point2.y,
+            point3.x, point3.y);
+
+  XDrawLine(display_ptr, win, gc_yellow, point3.x, point3.y,
+            point1.x, point1.y);
 }
 
+void rotatePoint(int x, int y, int deg){
+  int x1 = (x * cos(deg)) - (y * sin(deg));
+  int y1 = (y * cos(deg)) + (x * sin(deg));
 
+  struct Point point1 = {x1, y1};
+
+  cout << point1.x << point1.y << "Here we are" << "\n";
+}
 
 int main(int argc, char **argv)
 {
+  rotatePoint(2,1,90);
+
+  /* TESTS
+      struct Point e1 = {10,60};
+      struct Point c1 = {0,0};
+      struct Point c2 = {20,0};
+      struct Point c3 = {10,30};
+      pointInTriangle(e1, c1,c2,c3)? cout << "Inside\n" : cout << "Not inside\n";
+      
+      struct Point p1 = {1, 1}, q1 = {10, 1}; 
+      struct Point p2 = {1, 2}, q2 = {10, 2}; 
+    
+      doIntersect(p1, q1, p2, q2)? cout << "Yes\n": cout << "No\n"; 
+    
+      p1 = {10, 0}, q1 = {0, 10}; 
+      p2 = {0, 0}, q2 = {10, 10}; 
+      doIntersect(p1, q1, p2, q2)? cout << "Yes\n": cout << "No\n"; 
+      p1 = {-5, -5}, q1 = {0, 0}; 
+      p2 = {1, 1}, q2 = {10, 10}; 
+      doIntersect(p1, q1, p2, q2)? cout << "Yes\n": cout << "No\n"; 
+
+      */
+  int gridSize = 4;
+  int cellSize = 5;
+  int degrees = 36;
+
+  int freeSpace[gridSize][gridSize][degrees];
+  struct Point origin = {0, 0}, origin1 = {-3, 0}, origin2 = {0, -3}, origin3 = {3, 3};
+  struct Point temp, temp1, temp2, temp3;
+  /*obstacles*/
+  struct Point obs1_v1 = {20, 20}, obs1_v2 = {15, 17}, obs1_v3 = {20, 15};
+  struct Point obs2_v1 = {200, 200}, obs2_v2 = {200, 230}, obs2_v3 = {250, 210};
+  struct Triangle obstacle1 = {obs1_v1, obs1_v2, obs1_v3};
+  struct Triangle obstacle2 = {obs2_v1, obs2_v2, obs2_v3};
+  struct Triangle obstacles[2] = {obstacle1};
+
+  int noOfObstacles = sizeof(obstacles)/sizeof(obstacles[0]);
+  
+  for (int i = 0; i < gridSize; i++)
+  {
+    for (int j = 0; j < gridSize; j++)
+    {
+      for (int k = 0; k < degrees; k++)
+      {
+        int deg = 10 * k;
+
+        /* compute projection of rotation and translation */
+        temp.x = computeNewX_Y(origin.x * j * 5, deg, 'x');
+        temp.y = computeNewX_Y(origin.y * i * 5, deg, 'y');
+
+        temp1.x = computeNewX_Y(origin1.x * j * 5, deg, 'x');
+        temp1.y = computeNewX_Y(origin1.y * i * 5, deg, 'y');
+
+        temp2.x = computeNewX_Y(origin2.x * j * 5, deg, 'x');
+        temp2.y = computeNewX_Y(origin2.y * i * 5, deg, 'y');
+
+        temp3.x = computeNewX_Y(origin3.x * j * 5, deg, 'x');
+        temp3.y = computeNewX_Y(origin3.y * i * 5, deg, 'y');
+        
+        
+        /* check bounding condition */
+        if (temp.x < 0 || temp.x > (gridSize*5) || temp.y < 0 || temp.y > (gridSize*5))
+        {
+          freeSpace[i][j][k] = 0;
+        }
+        /* check obstacle collision */
+        else if (isCollidingWithObstacle(temp1, temp2, temp3, obstacles, noOfObstacles))
+        {
+          freeSpace[i][j][k] = 0;
+        }
+        else
+        {
+          freeSpace[i][j][k] = 1;
+          
+        }
+
+      }
+    }
+  }
+  
+
   /* opening display: basic connection to X Server */
   if ((display_ptr = XOpenDisplay(display_name)) == NULL)
   {
@@ -123,8 +217,8 @@ int main(int argc, char **argv)
   wm_hints->initial_state = NormalState;
   wm_hints->input = False;
 
-  class_hints->res_name = (char*)"x_use_example";
-  class_hints->res_class = (char*)"examples";
+  class_hints->res_name = (char *)"x_use_example";
+  class_hints->res_class = (char *)"examples";
 
   XSetWMProperties(display_ptr, win, &win_name, &icon_name, argv, argc,
                    size_hints, wm_hints, class_hints);
@@ -189,97 +283,13 @@ int main(int argc, char **argv)
       Point point2 = {100, 130};
       Point point3 = {150, 110};
       createObstacles(point1, point2, point3);
-      
+
       Point point1R = {200, 200};
       Point point2R = {200, 230};
       Point point3R = {250, 210};
       createRobot(point1R, point2R, point3R);
 
-      /* TESTS
-      struct Point e1 = {10,60};
-      struct Point c1 = {0,0};
-      struct Point c2 = {20,0};
-      struct Point c3 = {10,30};
-      pointInTriangle(e1, c1,c2,c3)? cout << "Inside\n" : cout << "Not inside\n";
-      
-      struct Point p1 = {1, 1}, q1 = {10, 1}; 
-      struct Point p2 = {1, 2}, q2 = {10, 2}; 
-    
-      doIntersect(p1, q1, p2, q2)? cout << "Yes\n": cout << "No\n"; 
-    
-      p1 = {10, 0}, q1 = {0, 10}; 
-      p2 = {0, 0}, q2 = {10, 10}; 
-      doIntersect(p1, q1, p2, q2)? cout << "Yes\n": cout << "No\n"; 
-      p1 = {-5, -5}, q1 = {0, 0}; 
-      p2 = {1, 1}, q2 = {10, 10}; 
-      doIntersect(p1, q1, p2, q2)? cout << "Yes\n": cout << "No\n"; 
-
-      */
-      int gridSize = 100;
-      int cellSize = 5;
-      int degrees = 36;
-
-      int freeSpace[gridSize][gridSize][degrees]; 
-      struct Point origin={0,0}, origin1 = {-6,-3}, origin2 = {-6,3}, origin3 = {10, 0};
-      struct Point temp, temp1, temp2, temp3;
-      /*obstacles*/
-      struct Point obs1_v1={100,100}, obs1_v2={100,130}, obs1_v3={150,110};
-      struct Triangle obstacle1 = {obs1_v1,obs1_v2,obs1_v3};
-      struct Triangle obstacles[1];
-      obstacles[0] = obstacle1;
-
-
-
-      for (int i= 0; i<gridSize; i++){
-        for (int j=0; j<gridSize; j++ ){
-          for (int k=0; k<degrees; k++){
-            int deg = 10 * k;
-
-            if (deg == 0){
-
-              origin1.x = computeNewX_Y(j*5, deg, 'x');
-              origin1.y = computeNewX_Y(i*5, deg, 'y');
-
-              origin2.x = computeNewX_Y(j*5, deg, 'x');
-              origin2.y = computeNewX_Y(i*5, deg, 'y');
-
-              origin3.x = computeNewX_Y(j*5, deg, 'x');
-              origin3.y = computeNewX_Y(i*5, deg, 'y');
-            }
-            /* compute projection of rotation and translation */
-            temp.x = computeNewX_Y(origin.x * 5, deg, 'x');
-            temp.y = computeNewX_Y(origin.y * 5, deg, 'y');
-
-            temp1.x = computeNewX_Y(origin1.x * 5, deg, 'x');
-            temp1.y = computeNewX_Y(origin1.y * 5, deg, 'y');
-
-            temp2.x = computeNewX_Y(origin2.x * 5, deg, 'x');
-            temp2.y = computeNewX_Y(origin2.y * 5, deg, 'y');
-
-            temp3.x = computeNewX_Y(origin3.x * 5, deg, 'x');
-            temp3.y = computeNewX_Y(origin3.y * 5, deg, 'y');
-
-            /* check bounding condition */
-            if (temp.x < 0 || temp.x > gridSize || temp.y < 0 || temp.y > gridSize){
-              freeSpace[i][j][k] = 0;
-              break;
-            }
-
-            /* check obstacle collision */
-            if (isCollidingWithObstacle(temp1, temp2, temp3, obstacles, sizeof(obstacles))){
-              freeSpace[i][j][k] = 0;
-              break;
-            }else{
-              freeSpace[i][j][k] = 1;
-              break;
-            }
-  
-          }
-        }
-      }
-
-      
-     /*              
+      /*              
       XDrawLine(display_ptr, win, gc_red, win_width / 4, 2 * win_height / 3,
                 3 * win_width / 4, 2 * win_height / 3);
       XFillArc(display_ptr, win, gc_grey, win_width / 2 - win_height / 6,
@@ -289,7 +299,7 @@ int main(int argc, char **argv)
                win_height / 6, win_height / 3, 90 * 64, 180 * 64);
      */
     }
-      break;
+    break;
     case ConfigureNotify:
       /* This event happens when the user changes the size of the window*/
       win_width = report.xconfigure.width;
