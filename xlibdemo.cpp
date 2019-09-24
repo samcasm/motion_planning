@@ -57,8 +57,28 @@ void createGrid(int gridLength, int cellSize)
   }
 }
 
+Point fix_neg_points(Point p){
+  struct Point newp;
+  if (p.x < 0 && p.y < 0){
+    newp = {0,0};
+  }else if (p.x < 0 and p.y > 0){
+    newp = {0, p.y};
+  }else if (p.x > 0 and p.y < 0){
+    newp = {p.x, 0};
+  }else{
+    newp = {p.x, p.y};
+  }
+
+  return newp;
+}
+
 void createTriangles(Point point1, Point point2, Point point3, int gridLength, int type)
 {
+  if (type == 0) {
+    point1 = fix_neg_points(point1);
+    point2 = fix_neg_points(point2);
+    point3 = fix_neg_points(point3);
+  }
   /* type == 1 for obstacles(red), else 0(yellow) */ 
   XDrawLine(display_ptr, win, type == 1? gc_red: gc_yellow, point1.x * win_width / gridLength, point1.y * win_height / gridLength,
             point2.x * win_width / gridLength, point2.y * win_height / gridLength);
