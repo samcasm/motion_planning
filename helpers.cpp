@@ -1,6 +1,8 @@
 #include <iostream>
 #include <math.h>
 #include "helpers.h"
+#include <string.h>
+#include <queue>
 using namespace std;
 
 /* custom functions */
@@ -77,8 +79,8 @@ bool isPointOutOfBounds(Point a, int gridSize){
   return false;
 }
 
-bool isCollidingWithBoundary(Point a, Point b, Point c, int gridSize){
-  if (isPointOutOfBounds(a, gridSize) || isPointOutOfBounds(b, gridSize) || isPointOutOfBounds(c, gridSize)){
+bool isCollidingWithBoundary(Point a, Point b, Point c, int gridLength){
+  if (isPointOutOfBounds(a, gridLength) || isPointOutOfBounds(b, gridLength) || isPointOutOfBounds(c, gridLength)){
     return true;
   }
   return false; 
@@ -118,3 +120,75 @@ bool isCollidingWithObstacle(Point x, Point y, Point z, Triangle *obstacles, int
   } 
   return false;
 }
+
+bool isValid(int grid[100][100][36],int x, int y, int z){
+
+    int size1 = 100;
+    int size2 = 100;
+    int size3 = 36;
+
+  if (x >= size1 || x < 0 
+      || y >= size2 || y < 0 
+      || z >= size3 || z < 0 
+      || grid[x][y][z] != 1) {
+          return false;    
+    }
+    return true;
+}
+
+int BFS(int grid[100][100][36], Cell src, Cell dest, int gridsize, int deg){
+    
+    if(!isValid(grid, src.x, src.y, src.z) || !isValid(grid, dest.x, dest.y, dest.z)){
+      return 0;
+    }
+    
+    int d1[6] = {1, -1, 0, 0, 0, 0};    
+    int d2[6] = {0, 0, 1, -1, 0, 0};    
+    int d3[6] = {0, 0, 0, 0, 1, -1};    
+    
+    bool visited[100][100][36];
+    memset(visited, false, sizeof(visited) ); 
+
+    visited[src.x][src.y][src.z] = true;
+
+    std::queue<queueNode> q;
+
+    struct queueNode s = {src, 0};
+    q.push(s);
+
+    while (!q.empty()){
+        queueNode curr = q.front(); 
+        Cell pt = curr.pt; 
+  
+        // If we have reached the destination cell, 
+        // we are done 
+        if (pt.x == dest.x && pt.y == dest.y && pt.z == dest.z) 
+            return curr.dist; 
+  
+        // Otherwise dequeue the front cell in the queue 
+        // and enqueue its adjacent cells 
+        q.pop(); 
+  
+        for (int i = 0; i < sizeof(d1); i++) 
+        { 
+            int row = pt.x + d1[i]; 
+            int col = pt.y + d2[i]; 
+            int deg = pt.z + d3[i];
+              
+            // if adjacent cell is valid, has path and 
+            // not visited yet, enqueue it. 
+            if (isValid(grid, row, col, deg) && grid[row][col][deg] &&  
+               !visited[row][col][deg]) 
+            { 
+                // mark cell as visited and enqueue it 
+                visited[row][col][deg] = true; 
+                queueNode Adjcell = { {row, col, deg}, 
+                                      curr.dist + 1 }; 
+                q.push(Adjcell); 
+            } 
+        } 
+    }
+
+
+  }
+

@@ -191,10 +191,11 @@ int main(int argc, char **argv)
           freeSpace[i][j][k] = 1;
           
         }
-        
+
       }
     }
   }
+  
   
 
   /* opening display: basic connection to X Server */
