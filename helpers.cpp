@@ -70,6 +70,20 @@ int computeNewX_Y(int x_y, int deg, char selection){
   return ( ((x_y * 5) * sin(deg)) + ((x_y) * cos(deg)) ) + (x_y * 5);
 }
 
+bool isPointOutOfBounds(Point a, int gridSize){
+  if (a.x < 0 || a.x > gridSize || a.y < 0 || a.y > gridSize){
+    return true;
+  }
+  return false;
+}
+
+bool isCollidingWithBoundary(Point a, Point b, Point c, int gridSize){
+  if (isPointOutOfBounds(a, gridSize) || isPointOutOfBounds(b, gridSize) || isPointOutOfBounds(c, gridSize)){
+    return true;
+  }
+  return false; 
+}
+
 bool isCollidingWithObstacle(Point x, Point y, Point z, Triangle *obstacles, int noOfObstacles){
   struct Triangle triangle1 = {x, y, z};
   for (int i=0; i<noOfObstacles; i++){

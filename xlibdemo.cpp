@@ -144,15 +144,15 @@ int main(int argc, char **argv)
       doIntersect(p1, q1, p2, q2)? cout << "Yes\n": cout << "No\n"; 
 
       */
-  int gridSize = 100;
+  int gridSize = 20;
   int cellSize = 5;
-  int degrees = 36;
+  int degrees = 6;
 
   int freeSpace[gridSize][gridSize][degrees];
-  struct Point origin = {0, 0}, origin1 = {-6, -3}, origin2 = {-6, 3}, origin3 = {10, 0};
+  struct Point origin = {0, 0}, origin1 = {-6, -3}, origin2 = {-6, 3}, origin3 = {5, 0};
   struct Point temp, temp1, temp2, temp3;
   /*obstacles*/
-  struct Point obs1_v1 = {100, 100}, obs1_v2 = {100, 130}, obs1_v3 = {150, 110};
+  struct Point obs1_v1 = {10, 10}, obs1_v2 = {10, 13}, obs1_v3 = {15, 11};
   struct Triangle obstacle1 = {obs1_v1, obs1_v2, obs1_v3};
   struct Triangle obstacles[1] = {obstacle1};
 
@@ -167,23 +167,23 @@ int main(int argc, char **argv)
         int deg = 10 * k;
 
         /* compute projection of rotation and translation */
-        temp = rotate_trans_Point(origin, j, i, 0);
-
         temp1 = rotate_trans_Point(origin1, j, i, deg);
 
         temp2 = rotate_trans_Point(origin2,j ,i, deg);
 
-        temp3= rotate_trans_Point(origin3, j ,i, deg);
+        temp3 = rotate_trans_Point(origin3, j ,i, deg);
         
         /* check bounding condition */
-        if (temp.x < 0 || temp.x > (gridSize*5) || temp.y < 0 || temp.y > (gridSize*5))
+        if (isCollidingWithBoundary(temp1, temp2, temp3, gridSize * cellSize))
         {
+          cout << "collides with boundary";
           freeSpace[i][j][k] = 0;
           break;
         }
         /* check obstacle collision */
         else if (isCollidingWithObstacle(temp1, temp2, temp3, obstacles, noOfObstacles))
         { 
+          cout << "is collides with obstacle";
           freeSpace[i][j][k] = 0;
         }
         else
