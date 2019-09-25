@@ -191,7 +191,7 @@ int main(int argc, char **argv)
           freeSpace[i][j][k] = 1;
           
         }
-
+        
       }
     }
   }
