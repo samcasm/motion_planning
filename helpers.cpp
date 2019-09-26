@@ -121,11 +121,11 @@ bool isCollidingWithObstacle(Point x, Point y, Point z, Triangle *obstacles, int
   return false;
 }
 
-bool isValid(int grid[100][100][36],int x, int y, int z){
+bool isValid(int grid[][20][8],int x, int y, int z){
 
-    int size1 = 100;
-    int size2 = 100;
-    int size3 = 36;
+    int size1 = 20;
+    int size2 = 20;
+    int size3 = 8;
 
   if (x >= size1 || x < 0 
       || y >= size2 || y < 0 
@@ -136,17 +136,17 @@ bool isValid(int grid[100][100][36],int x, int y, int z){
     return true;
 }
 
-int BFS(int grid[100][100][36], Cell src, Cell dest, int gridsize, int deg){
+int BFS(int grid[][20][8], Cell src, Cell dest, int gridSize, int deg){
     
     if(!isValid(grid, src.x, src.y, src.z) || !isValid(grid, dest.x, dest.y, dest.z)){
-      return 0;
+      return -1;
     }
     
     int d1[6] = {1, -1, 0, 0, 0, 0};    
     int d2[6] = {0, 0, 1, -1, 0, 0};    
     int d3[6] = {0, 0, 0, 0, 1, -1};    
     
-    bool visited[100][100][36];
+    bool visited[gridSize][gridSize][deg];
     memset(visited, false, sizeof(visited) ); 
 
     visited[src.x][src.y][src.z] = true;
@@ -185,7 +185,8 @@ int BFS(int grid[100][100][36], Cell src, Cell dest, int gridsize, int deg){
                 queueNode Adjcell = { {row, col, deg}, 
                                       curr.dist + 1 }; 
                 q.push(Adjcell); 
-            } 
+            }   int gridSize = 20;
+
         } 
     }
 

@@ -23,5 +23,5 @@ bool pointInTriangle(Point x, Point a, Point b, Point c);
 int computeNewX_Y(int x_y, int deg, char selection);
 bool isCollidingWithBoundary(Point a, Point b, Point c, int gridSize);
 bool isCollidingWithObstacle(Point x, Point y, Point z, Triangle *obstacles, int noOfObstacles);
-int BFS(int grid[100][100][36], int x, int y, int z);
+int BFS(int grid[][20][8], Cell src, Cell dest, int gridSize, int deg);
 #endif
