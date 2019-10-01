@@ -189,10 +189,11 @@ int BFS(int grid[][20][8], Cell src, Cell dest, int gridSize, int deg){
             { 
                 // mark cell as visited and enqueue it 
                 visited[row][col][deg] = true; 
-                struct queueNode Adjcell = { {row, col, deg}, 
-                                      curr.dist + 1 }; 
                 struct Cell currentCell = {row, col, deg};
+                struct queueNode Adjcell = { {row, col, deg}, 
+                                      curr.dist + 1 };
                 Adjcell.pathVector.push_back(currentCell);
+                Adjcell.pathVector.insert(Adjcell.pathVector.end(), curr.pathVector.begin(), curr.pathVector.end()); 
                 q.push(Adjcell); 
             }   
 
