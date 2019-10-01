@@ -153,7 +153,10 @@ int BFS(int grid[][20][8], Cell src, Cell dest, int gridSize, int deg){
 
     std::queue<queueNode> q;
 
+    struct Cell sourceCell = src;
     struct queueNode s = {src, 0};
+    s.pathVector.push_back(sourceCell);
+
     q.push(s);
 
     while (!q.empty()){
@@ -162,8 +165,12 @@ int BFS(int grid[][20][8], Cell src, Cell dest, int gridSize, int deg){
   
         // If we have reached the destination cell, 
         // we are done 
-        if (pt.x == dest.x && pt.y == dest.y && pt.z == dest.z) 
+        if (pt.x == dest.x && pt.y == dest.y && pt.z == dest.z) {
+            for (int i=0; i<curr.pathVector.size(); i++){
+              cout << curr.pathVector[i].x << curr.pathVector[i].y << curr.pathVector[i].z <<" \n";
+            }
             return curr.dist; 
+        }
   
         // Otherwise dequeue the front cell in the queue 
         // and enqueue its adjacent cells 
@@ -182,10 +189,12 @@ int BFS(int grid[][20][8], Cell src, Cell dest, int gridSize, int deg){
             { 
                 // mark cell as visited and enqueue it 
                 visited[row][col][deg] = true; 
-                queueNode Adjcell = { {row, col, deg}, 
+                struct queueNode Adjcell = { {row, col, deg}, 
                                       curr.dist + 1 }; 
+                struct Cell currentCell = {row, col, deg};
+                Adjcell.pathVector.push_back(currentCell);
                 q.push(Adjcell); 
-            }   int gridSize = 20;
+            }   
 
         } 
     }

@@ -1,5 +1,8 @@
 #ifndef HELPERS_H
 #define HELPERS_H
+#include <vector>
+using namespace std;
+
 extern int gridSize;
 struct Point
 {
@@ -14,6 +17,7 @@ struct Cell{
 struct queueNode{
     Cell pt;
     int dist;
+    std::vector<Cell> pathVector;
 };
 
 bool pointOnSegment(Point a, Point b, Point c);

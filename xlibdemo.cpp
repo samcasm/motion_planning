@@ -196,13 +196,15 @@ int main(int argc, char **argv)
     }
   }
 
-  struct Cell src = {10,13,0};
-  struct Cell dest = {19,19,5};
+  struct Cell src = {5,5,1};
+  struct Cell dest = {15,15,5};
   cout << freeSpace[0][0][0] << "free space source\n";
   cout << freeSpace[15][15][2] << "dest\n";
   
   int result = BFS(freeSpace, src, dest, gridSize, degrees);
   cout << result << "the result \n";
+
+  
   
 
   /* opening display: basic connection to X Server */
