@@ -123,6 +123,36 @@ Point rotate_trans_Point(Point P, int x, int y, int deg){
 
 int main(int argc, char **argv)
 {
+  FILE *inputfile;
+  int vx[3], vy[3], startx, starty, startphi, targetx, targety, targetphi;
+  int obstx[3][30], obsty[3][30], i, finished, number_obst;
+
+  if (argc != 2){
+    cout << "need filename as command line argument. \n"; fflush(stdout);
+    exit(0);
+  }
+  inputfile = fopen(argv[1], "r");
+  if (fscanf(inputfile, "V (%d,%d) (%d,%d) (%d, %d)\n", &(vx[0]), &(vy[0]), &(vx[1]), &(vy[1]), &(vx[2]), &(vy[2])) != 6){
+    cout << "error in first line.\n"; fflush(stdout);
+    exit(0);
+  }
+  if (fscanf(inputfile, "S (%d,%d) %d\n", &startx, &starty, &startphi) != 3){
+    cout << "error in the third line. \n"; fflush(stdout);
+    exit(0);
+  }
+  if (fscanf(inputfile, "T (%d,%d) %d\n", &targetx, &targety, &targetphi) != 3){
+    cout << "error in the third line. \n"; fflush(stdout);
+    exit(0);
+  }
+  i=0; finished = 0;
+  while (i<30 && !finished){
+    if(fscanf(inputfile, "O (%d,%d) (%d,%d) (%d,%d)\n", &(obstx[0][i]), &(obsty[0][i]), &(obstx[1][i]), &(obsty[1][i]), &(obsty[2][i]), &(obsty[2][i])) != 6) {
+      finished = 1;
+    }
+    else i += 1;
+  }
+  number_obst = i;
+  cout << "found " << i <<  " obstacles. so far ok\n";
 
   /* TESTS
       struct Point e1 = {10,60};
@@ -146,7 +176,7 @@ int main(int argc, char **argv)
       */
   int gridSize = 20;
   int cellSize = 5;
-  int degrees = 6;
+  int degrees = 8;
 
   int freeSpace[20][20][8];
   struct Point origin = {0, 0}, origin1 = {-6, -3}, origin2 = {-6, 3}, origin3 = {5, 0};
@@ -177,7 +207,6 @@ int main(int argc, char **argv)
         if (isCollidingWithBoundary(temp1, temp2, temp3, gridSize * cellSize))
         {
           freeSpace[i][j][k] = 0;
-          break;
         }
         /* check obstacle collision */
         else if (isCollidingWithObstacle(temp1, temp2, temp3, obstacles, noOfObstacles))
@@ -190,7 +219,7 @@ int main(int argc, char **argv)
           
         }
 
-        /*cout << freeSpace[i][j][k] << "     " <<i << j << k << "\n";*/
+        /*cout << freeSpace[i][j][k] << "   " ;*/
 
       }
     }
@@ -198,14 +227,10 @@ int main(int argc, char **argv)
 
   struct Cell src = {5,5,1};
   struct Cell dest = {15,15,5};
-  cout << freeSpace[0][0][0] << "free space source\n";
-  cout << freeSpace[15][15][2] << "dest\n";
   
   int result = BFS(freeSpace, src, dest, gridSize, degrees);
-  cout << result << "the result \n";
+  /*cout << result << "the result \n";*/
 
-  
-  
 
   /* opening display: basic connection to X Server */
   if ((display_ptr = XOpenDisplay(display_name)) == NULL)

@@ -126,7 +126,6 @@ bool isValid(int grid[][20][8],int x, int y, int z){
     int size1 = 20;
     int size2 = 20;
     int size3 = 8;
-
   if (x >= size1 || x < 0 
       || y >= size2 || y < 0 
       || z >= size3 || z < 0 
@@ -166,9 +165,9 @@ int BFS(int grid[][20][8], Cell src, Cell dest, int gridSize, int deg){
         // If we have reached the destination cell, 
         // we are done 
         if (pt.x == dest.x && pt.y == dest.y && pt.z == dest.z) {
-            for (int i=0; i<curr.pathVector.size(); i++){
+            /*for (int i=0; i<curr.pathVector.size(); i++){
               cout << curr.pathVector[i].x << curr.pathVector[i].y << curr.pathVector[i].z <<" \n";
-            }
+            }*/
             return curr.dist; 
         }
   
