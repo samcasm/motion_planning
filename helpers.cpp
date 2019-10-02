@@ -72,8 +72,8 @@ int computeNewX_Y(int x_y, int deg, char selection){
   return ( ((x_y * 5) * sin(deg)) + ((x_y) * cos(deg)) ) + (x_y * 5);
 }
 
-bool isPointOutOfBounds(Point a, int gridSize){
-  if (a.x < 0 || a.x > gridSize || a.y < 0 || a.y > gridSize){
+bool isPointOutOfBounds(Point a, int gridLength){
+  if (a.x < 0 || a.x > gridLength || a.y < 0 || a.y > gridLength){
     return true;
   }
   return false;

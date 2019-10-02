@@ -59,7 +59,7 @@ void createGrid(int gridLength, int cellSize)
 
 Point fix_neg_points(Point p){
   struct Point newp;
-  if (p.x < 0 && p.y < 0){
+  if (p.x <= 0 && p.y <= 0){
     newp = {0,0};
   }else if (p.x < 0 and p.y > 0){
     newp = {0, p.y};
@@ -68,7 +68,6 @@ Point fix_neg_points(Point p){
   }else{
     newp = {p.x, p.y};
   }
-
   return newp;
 }
 
@@ -105,6 +104,15 @@ void createRobot(Point point1, Point point2, Point point3)
 float degreeToRadian(int deg){
 
   return deg * PI / 180.0;
+}
+
+Cell convertPointToCell(int x, int y, int deg){
+    int var1 = int(x/5);
+    int var2 = int(y/5);
+    int var3 = int(deg/10);
+
+    struct Cell currcell = {var1, var2, var3};
+    return currcell;
 }
 
 Point rotate_trans_Point(Point P, int x, int y, int deg){
@@ -230,8 +238,11 @@ int main(int argc, char **argv)
     }
   }
 
-  struct Cell src = {5,5,1};
-  struct Cell dest = {15,15,5};
+
+  struct Cell src = convertPointToCell(startx, starty, startphi);
+  struct Cell dest = convertPointToCell(targetx, targety, targetphi);
+
+
   
   /*int result = BFS(freeSpace, src, dest, gridSize, degrees, cellSize);*/
   /*cout << result << "the result \n";*/
