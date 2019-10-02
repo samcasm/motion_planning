@@ -86,7 +86,7 @@ bool isCollidingWithBoundary(Point a, Point b, Point c, int gridLength){
   return false; 
 }
 
-bool isCollidingWithObstacle(Point x, Point y, Point z, Triangle *obstacles, int noOfObstacles){
+bool isCollidingWithObstacle(Point x, Point y, Point z, vector<Triangle> obstacles, int noOfObstacles){
   struct Triangle triangle1 = {x, y, z};
   for (int i=0; i<noOfObstacles; i++){
     Triangle obstacle =  obstacles[i];
@@ -121,11 +121,11 @@ bool isCollidingWithObstacle(Point x, Point y, Point z, Triangle *obstacles, int
   return false;
 }
 
-bool isValid(int grid[][20][8],int x, int y, int z){
+bool isValid(int grid[][100][36],int x, int y, int z, int gridLength, int degrees){
 
-    int size1 = 20;
-    int size2 = 20;
-    int size3 = 8;
+    int size1 = gridLength;
+    int size2 = gridLength;
+    int size3 = degrees;
   if (x >= size1 || x < 0 
       || y >= size2 || y < 0 
       || z >= size3 || z < 0 
@@ -135,9 +135,9 @@ bool isValid(int grid[][20][8],int x, int y, int z){
     return true;
 }
 
-int BFS(int grid[][20][8], Cell src, Cell dest, int gridSize, int deg){
-    
-    if(!isValid(grid, src.x, src.y, src.z) || !isValid(grid, dest.x, dest.y, dest.z)){
+int BFS(int grid[][100][36], Cell src, Cell dest, int gridSize, int deg, int cellSize){
+
+    if(!isValid(grid, src.x, src.y, src.z, gridSize*cellSize, deg*10 ) || !isValid(grid, dest.x, dest.y, dest.z ,gridSize*cellSize, deg*10)){
       return -1;
     }
     
@@ -183,7 +183,7 @@ int BFS(int grid[][20][8], Cell src, Cell dest, int gridSize, int deg){
               
             // if adjacent cell is valid, has path and 
             // not visited yet, enqueue it. 
-            if (isValid(grid, row, col, deg) && grid[row][col][deg] &&  
+            if (isValid(grid, row, col, deg, gridSize*cellSize, deg*10) && grid[row][col][deg] &&  
                !visited[row][col][deg]) 
             { 
                 // mark cell as visited and enqueue it 

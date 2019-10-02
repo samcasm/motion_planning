@@ -123,6 +123,7 @@ Point rotate_trans_Point(Point P, int x, int y, int deg){
 
 int main(int argc, char **argv)
 {
+  /* read the input file */
   FILE *inputfile;
   int vx[3], vy[3], startx, starty, startphi, targetx, targety, targetphi;
   int obstx[3][30], obsty[3][30], i, finished, number_obst;
@@ -173,20 +174,24 @@ int main(int argc, char **argv)
       p2 = {1, 1}, q2 = {10, 10}; 
       doIntersect(p1, q1, p2, q2)? cout << "Yes\n": cout << "No\n"; 
 
-      */
-  int gridSize = 20;
+  */
+  int gridSize = 100;
   int cellSize = 5;
-  int degrees = 8;
+  int degrees = 36;
 
-  int freeSpace[20][20][8];
-  struct Point origin = {0, 0}, origin1 = {-6, -3}, origin2 = {-6, 3}, origin3 = {5, 0};
+  int freeSpace[100][100][36];
+  struct Point origin = {0, 0}, origin1 = {vx[0], vy[0]}, origin2 = {vx[1], vy[1]}, origin3 = {vx[2], vy[2]};
   struct Point temp, temp1, temp2, temp3;
   /*obstacles*/
-  struct Point obs1_v1 = {10, 10}, obs1_v2 = {10, 13}, obs1_v3 = {15, 11};
-  struct Triangle obstacle1 = {obs1_v1, obs1_v2, obs1_v3};
-  struct Triangle obstacles[1] = {obstacle1};
-
-  int noOfObstacles = sizeof(obstacles)/sizeof(obstacles[0]);
+  std::vector<Triangle> obstacles;
+  
+  for (int i=0; i<number_obst; i++){
+    struct Point obst_v1 = {obstx[0][i], obsty[0][i]}, obst_v2 = {obstx[1][i], obsty[1][i]}, obst_v3 = {obstx[2][i], obsty[2][i]};
+    struct Triangle obstacle_tri = {obst_v1, obst_v2, obst_v3};
+    obstacles.push_back(obstacle_tri);
+  }
+  
+  int noOfObstacles = number_obst;
   
   for (int i = 0; i < gridSize; i++)
   {
@@ -228,7 +233,7 @@ int main(int argc, char **argv)
   struct Cell src = {5,5,1};
   struct Cell dest = {15,15,5};
   
-  int result = BFS(freeSpace, src, dest, gridSize, degrees);
+  /*int result = BFS(freeSpace, src, dest, gridSize, degrees, cellSize);*/
   /*cout << result << "the result \n";*/
 
 
@@ -341,7 +346,10 @@ int main(int argc, char **argv)
 			 each time some part ofthe window gets exposed (becomes visible) */
 
       createGrid(gridSize * cellSize, cellSize);
-      createTriangles(obs1_v1, obs1_v2, obs1_v3, gridSize * cellSize, 1);
+
+      for (int i=0; i<noOfObstacles; i++){
+        createTriangles(obstacles[i].x, obstacles[i].y, obstacles[i].z, gridSize * cellSize, 1);
+      }
 
       createTriangles(origin1, origin2, origin3, gridSize * cellSize, 0);
 
