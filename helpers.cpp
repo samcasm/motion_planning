@@ -137,7 +137,7 @@ bool isValid(int grid[][100][36],int x, int y, int z, int gridLength, int degree
 
 int BFS(int grid[][100][36], Cell src, Cell dest, int gridSize, int deg, int cellSize){
 
-    if(!isValid(grid, src.x, src.y, src.z, gridSize*cellSize, deg*10 ) || !isValid(grid, dest.x, dest.y, dest.z ,gridSize*cellSize, deg*10)){
+    if(!isValid(grid, src.x, src.y, src.z, gridSize, deg ) || !isValid(grid, dest.x, dest.y, dest.z ,gridSize, deg)){
       return -1;
     }
     
@@ -183,7 +183,7 @@ int BFS(int grid[][100][36], Cell src, Cell dest, int gridSize, int deg, int cel
               
             // if adjacent cell is valid, has path and 
             // not visited yet, enqueue it. 
-            if (isValid(grid, row, col, deg, gridSize*cellSize, deg*10) && grid[row][col][deg] &&  
+            if (isValid(grid, row, col, deg, gridSize, deg) && grid[row][col][deg] &&  
                !visited[row][col][deg]) 
             { 
                 // mark cell as visited and enqueue it 
@@ -198,7 +198,7 @@ int BFS(int grid[][100][36], Cell src, Cell dest, int gridSize, int deg, int cel
 
         } 
     }
-
+    cout << "Could not find a path";
 
   }
 

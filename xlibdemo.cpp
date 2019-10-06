@@ -131,10 +131,11 @@ Point rotate_trans_Point(Point P, int x, int y, int deg){
 
 int main(int argc, char **argv)
 {
-  /* read the input file */
+  /********************************                    read the input file                        ***********************************/
   FILE *inputfile;
   int vx[3], vy[3], startx, starty, startphi, targetx, targety, targetphi;
-  int obstx[3][30], obsty[3][30], i, finished, number_obst;
+  int i, finished, number_obst;
+  short obstx[3][30], obsty[3][30];
 
   if (argc != 2){
     cout << "need filename as command line argument. \n"; fflush(stdout);
@@ -155,7 +156,7 @@ int main(int argc, char **argv)
   }
   i=0; finished = 0;
   while (i<30 && !finished){
-    if(fscanf(inputfile, "O (%d,%d) (%d,%d) (%d,%d)\n", &(obstx[0][i]), &(obsty[0][i]), &(obstx[1][i]), &(obsty[1][i]), &(obsty[2][i]), &(obsty[2][i])) != 6) {
+    if(fscanf(inputfile, "O (%hu,%hu) (%hu,%hu) (%hu,%hu)\n", &(obstx[0][i]), &(obsty[0][i]), &(obstx[1][i]), &(obsty[1][i]), &(obstx[2][i]), &(obsty[2][i])) != 6) {
       finished = 1;
     }
     else i += 1;
@@ -163,26 +164,6 @@ int main(int argc, char **argv)
   number_obst = i;
   cout << "found " << i <<  " obstacles. so far ok\n";
 
-  /* TESTS
-      struct Point e1 = {10,60};
-      struct Point c1 = {0,0};
-      struct Point c2 = {20,0};
-      struct Point c3 = {10,30};
-      pointInTriangle(e1, c1,c2,c3)? cout << "Inside\n" : cout << "Not inside\n";
-      
-      struct Point p1 = {1, 1}, q1 = {10, 1}; 
-      struct Point p2 = {1, 2}, q2 = {10, 2}; 
-    
-      doIntersect(p1, q1, p2, q2)? cout << "Yes\n": cout << "No\n"; 
-    
-      p1 = {10, 0}, q1 = {0, 10}; 
-      p2 = {0, 0}, q2 = {10, 10}; 
-      doIntersect(p1, q1, p2, q2)? cout << "Yes\n": cout << "No\n"; 
-      p1 = {-5, -5}, q1 = {0, 0}; 
-      p2 = {1, 1}, q2 = {10, 10}; 
-      doIntersect(p1, q1, p2, q2)? cout << "Yes\n": cout << "No\n"; 
-
-  */
   int gridSize = 100;
   int cellSize = 5;
   int degrees = 36;
@@ -242,10 +223,13 @@ int main(int argc, char **argv)
   struct Cell src = convertPointToCell(startx, starty, startphi);
   struct Cell dest = convertPointToCell(targetx, targety, targetphi);
 
-
+  cout << src.x << src.y << src.z << "the source\n";
+  cout << dest.x << dest.y << dest.z << "the destination\n";
+  cout << freeSpace[90][10][4] << " " << freeSpace[10][10][0];
   
-  /*int result = BFS(freeSpace, src, dest, gridSize, degrees, cellSize);*/
-  /*cout << result << "the result \n";*/
+  int result = BFS(freeSpace, src, dest, gridSize, degrees, cellSize);
+  cout << result << "the result \n";
+
 
 
   /* opening display: basic connection to X Server */
@@ -313,10 +297,10 @@ int main(int argc, char **argv)
   /* create graphics context, so that we may draw in this window */
   gc = XCreateGC(display_ptr, win, valuemask, &gc_values);
   XSetForeground(display_ptr, gc, BlackPixel(display_ptr, screen_num));
-  XSetLineAttributes(display_ptr, gc, 4, LineSolid, CapRound, JoinRound);
+  XSetLineAttributes(display_ptr, gc, 1, LineSolid, CapRound, JoinRound);
   /* and three other graphics contexts, to draw in yellow and red and grey*/
   gc_yellow = XCreateGC(display_ptr, win, valuemask, &gc_yellow_values);
-  XSetLineAttributes(display_ptr, gc_yellow, 6, LineSolid, CapRound, JoinRound);
+  XSetLineAttributes(display_ptr, gc_yellow, 2, LineSolid, CapRound, JoinRound);
   if (XAllocNamedColor(display_ptr, color_map, "yellow",
                        &tmp_color1, &tmp_color2) == 0)
   {
@@ -326,7 +310,7 @@ int main(int argc, char **argv)
   else
     XSetForeground(display_ptr, gc_yellow, tmp_color1.pixel);
   gc_red = XCreateGC(display_ptr, win, valuemask, &gc_red_values);
-  XSetLineAttributes(display_ptr, gc_red, 6, LineSolid, CapRound, JoinRound);
+  XSetLineAttributes(display_ptr, gc_red, 2, LineSolid, CapRound, JoinRound);
   if (XAllocNamedColor(display_ptr, color_map, "red",
                        &tmp_color1, &tmp_color2) == 0)
   {
@@ -356,7 +340,21 @@ int main(int argc, char **argv)
       /* (re-)draw the example figure. This event happens
 			 each time some part ofthe window gets exposed (becomes visible) */
 
+      for (int i=0; i<number_obst; i++){
+        short point1_x = (obstx[0][i] * win_width) / 500;
+        short point1_y = (obsty[0][i] * win_height) / 500;
+        short point2_x = (obstx[1][i] * win_width) / 500;
+        short point2_y = (obsty[1][i] * win_height) / 500;
+        short point3_x = (obstx[2][i] * win_width) / 500;
+        short point3_y = (obsty[2][i] * win_height) / 500;
+        XPoint foo[] = {{point1_x,point1_y},{point2_x,point2_y},{point3_x,point3_y}};
+        int npoints = sizeof(foo)/sizeof(XPoint);
+
+        XFillPolygon(display_ptr, win, gc_red, foo , npoints, Convex, CoordModeOrigin);
+      }
+      
       createGrid(gridSize * cellSize, cellSize);
+      /*
 
       for (int i=0; i<noOfObstacles; i++){
         createTriangles(obstacles[i].x, obstacles[i].y, obstacles[i].z, gridSize * cellSize, 1);
@@ -389,13 +387,20 @@ int main(int argc, char **argv)
         int x, y;
         x = report.xbutton.x;
         y = report.xbutton.y;
-        if (report.xbutton.button == Button1)
-          XFillArc(display_ptr, win, gc_red,
-                   x - win_height / 40, y - win_height / 40,
-                   win_height / 20, win_height / 20, 0, 360 * 64);
-        else
+
+        short point1_x = (50 * win_width) / 500;
+        short point1_y = (50 * win_height) / 500;
+        short point2_x = (450 * win_width) / 500;
+        short point2_y = (50 * win_height) / 500;
+
+        
           XFillArc(display_ptr, win, gc_yellow,
-                   x - win_height / 40, y - win_height / 40,
+                   point1_x, point1_y,
+                   win_height / 20, win_height / 20, 0, 360 * 64);
+          
+        
+          XFillArc(display_ptr, win, gc_yellow,
+                   point2_x, point2_y,
                    win_height / 20, win_height / 20, 0, 360 * 64);
       }
       break;

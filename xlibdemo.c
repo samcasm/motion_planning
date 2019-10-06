@@ -166,6 +166,8 @@ int main(int argc, char **argv)
         int x, y;
         x = report.xbutton.x;
         y = report.xbutton.y;
+        XPoint foo[] = {{0,0},{20,0},{20,20}};
+        int npoints = sizeof(foo)/sizeof(XPoint);
         if (report.xbutton.button == Button1)
           XFillArc(display_ptr, win, gc_red,
                    x - win_height / 40, y - win_height / 40,
@@ -174,6 +176,7 @@ int main(int argc, char **argv)
           XFillArc(display_ptr, win, gc_yellow,
                    x - win_height / 40, y - win_height / 40,
                    win_height / 20, win_height / 20, 0, 360 * 64);
+          XFillPolygon(display_ptr, win, gc, foo , npoints, Convex, CoordModeOrigin);
       }
       break;
     default:
