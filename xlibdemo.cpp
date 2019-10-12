@@ -71,6 +71,7 @@ Point fix_neg_points(Point p){
   return newp;
 }
 
+
 void createTriangles(Point point1, Point point2, Point point3, int gridLength, int type)
 {
   if (type == 0) {
@@ -89,16 +90,19 @@ void createTriangles(Point point1, Point point2, Point point3, int gridLength, i
             point1.x * win_width / gridLength, point1.y * win_height / gridLength);
 }
 
-void createRobot(Point point1, Point point2, Point point3)
+void createRobot(short x0,short y0,short x1,short y1,short x2,short y2, int gridSize, int cellSize)
 {
-  XDrawLine(display_ptr, win, gc_yellow, point1.x, point1.y,
-            point2.x, point2.y);
-
-  XDrawLine(display_ptr, win, gc_yellow, point2.x, point2.y,
-            point3.x, point3.y);
-
-  XDrawLine(display_ptr, win, gc_yellow, point3.x, point3.y,
-            point1.x, point1.y);
+  
+  short point1_x = (x0 * win_width) / (gridSize * cellSize);
+  short point1_y = (y0 * win_height) / (gridSize * cellSize);
+  short point2_x = (x1 * win_width) / (gridSize * cellSize);
+  short point2_y = (y1 * win_height) / (gridSize * cellSize);
+  short point3_x = (x2 * win_width) / (gridSize * cellSize);
+  short point3_y = (y2 * win_height) / (gridSize * cellSize);
+  
+  XPoint foo[] = {{point1_x,point1_y},{point2_x,point2_y},{point3_x,point3_y}};
+  int npoints = sizeof(foo)/sizeof(XPoint);
+  XFillPolygon(display_ptr, win, gc_yellow, foo , npoints, Convex, CoordModeOrigin);
 }
 
 float degreeToRadian(int deg){
@@ -107,23 +111,32 @@ float degreeToRadian(int deg){
 }
 
 Cell convertPointToCell(int x, int y, int deg){
-    int var1 = int(x/5);
-    int var2 = int(y/5);
-    int var3 = int(deg/10);
+    int var1 = round(x/5);
+    int var2 = round(y/5);
+    int var3 = round(deg/10);
 
     struct Cell currcell = {var1, var2, var3};
     return currcell;
 }
 
 Point rotate_trans_Point(Point P, int x, int y, int deg){
-  int rotx = (P.x * cos(degreeToRadian(deg))) - (P.y * sin(degreeToRadian(deg)));
-  int roty = (P.x * sin(degreeToRadian(deg))) + (P.y * cos(degreeToRadian(deg)));
-  
-  int x1 = x * 5;
-  int y1 = y * 5;
+  float rotx = (P.x * cos(degreeToRadian(deg))) - (P.y * sin(degreeToRadian(deg)));
+  float roty = (P.x * sin(degreeToRadian(deg))) + (P.y * cos(degreeToRadian(deg)));
 
-  int resx = rotx + x1;
-  int resy = roty + y1;
+  /*
+  cout << P.x * cos(degreeToRadian(deg)) << "  "  << P.y * sin(degreeToRadian(deg)) << "\n";
+  cout << P.x * sin(degreeToRadian(deg)) << "  "  << P.y * cos(degreeToRadian(deg)) << "\n";
+  cout << P.x << " " << P.y << " " <<  deg << " actual points";
+  cout << rotx << " " << roty << " " << "rotated points";
+  cout << resx << " " << resy <<" finally\n" ;
+  */
+  
+  float x1 = x * 5;
+  float y1 = y * 5;
+
+
+  int resx = round(rotx) + x1;
+  int resy = round(roty) + y1;
   
   struct Point newpoint = {resx, resy};
   return newpoint;
@@ -133,16 +146,17 @@ int main(int argc, char **argv)
 {
   /********************************                    read the input file                        ***********************************/
   FILE *inputfile;
-  int vx[3], vy[3], startx, starty, startphi, targetx, targety, targetphi;
+  int startx, starty, startphi, targetx, targety, targetphi;
   int i, finished, number_obst;
   short obstx[3][30], obsty[3][30];
+  short vx[3], vy[3];
 
   if (argc != 2){
     cout << "need filename as command line argument. \n"; fflush(stdout);
     exit(0);
   }
   inputfile = fopen(argv[1], "r");
-  if (fscanf(inputfile, "V (%d,%d) (%d,%d) (%d, %d)\n", &(vx[0]), &(vy[0]), &(vx[1]), &(vy[1]), &(vx[2]), &(vy[2])) != 6){
+  if (fscanf(inputfile, "V (%hu,%hu) (%hu,%hu) (%hu, %hu)\n", &(vx[0]), &(vy[0]), &(vx[1]), &(vy[1]), &(vx[2]), &(vy[2])) != 6){
     cout << "error in first line.\n"; fflush(stdout);
     exit(0);
   }
@@ -164,11 +178,11 @@ int main(int argc, char **argv)
   number_obst = i;
   cout << "found " << i <<  " obstacles. so far ok\n";
 
-  int gridSize = 100;
-  int cellSize = 5;
-  int degrees = 36;
+  int gridSize = 5;
+  int cellSize = 2;
+  int degrees = 4;
 
-  int freeSpace[100][100][36];
+  int freeSpace[5][5][4];
   struct Point origin = {0, 0}, origin1 = {vx[0], vy[0]}, origin2 = {vx[1], vy[1]}, origin3 = {vx[2], vy[2]};
   struct Point temp, temp1, temp2, temp3;
   /*obstacles*/
@@ -188,7 +202,8 @@ int main(int argc, char **argv)
     {
       for (int k = 0; k < degrees; k++)
       {
-        int deg = 10 * k;
+        // change as per the degrees
+        int deg = 45 * k;
 
         /* compute projection of rotation and translation */
         temp1 = rotate_trans_Point(origin1, j, i, deg);
@@ -207,11 +222,10 @@ int main(int argc, char **argv)
         { 
           freeSpace[i][j][k] = 0;
         }
-        else
-        {
+        else{
           freeSpace[i][j][k] = 1;
-          
         }
+          
 
         /*cout << freeSpace[i][j][k] << "   " ;*/
 
@@ -219,16 +233,27 @@ int main(int argc, char **argv)
     }
   }
 
+  Point res = rotate_trans_Point(origin1, 2,2, 10);
+  Point res1 = rotate_trans_Point(origin1, 2,2, 20);
+  Point res2 = rotate_trans_Point(origin1, 2,2, 30);
+  Point res3 = rotate_trans_Point(origin1, 2,2, 40);
+  Point res4 = rotate_trans_Point(origin1, 2,2, 50);
+
+  cout << res.x << " " << res.y << " \n";
+  cout << res1.x << " " << res1.y << " \n";
+  cout << res2.x << " " << res2.y << " \n";
+  cout << res3.x << " " << res3.y << " \n";
+  cout << res4.x << " " << res4.y << " \n";
 
   struct Cell src = convertPointToCell(startx, starty, startphi);
   struct Cell dest = convertPointToCell(targetx, targety, targetphi);
 
-  cout << src.x << src.y << src.z << "the source\n";
-  cout << dest.x << dest.y << dest.z << "the destination\n";
-  cout << freeSpace[90][10][4] << " " << freeSpace[10][10][0];
+  cout << src.x << " " << src.y << " " << src.z << "the source\n";
+  cout << dest.x << " " << dest.y << " " << dest.z << "the destination\n";
+  cout << freeSpace[src.x][src.y][src.z] << " " << freeSpace[dest.x][dest.y][dest.z] << "\n";
   
-  int result = BFS(freeSpace, src, dest, gridSize, degrees, cellSize);
-  cout << result << "the result \n";
+  // int result = BFS(freeSpace, src, dest, gridSize, degrees, cellSize);
+  // cout << result << "the result \n";
 
 
 
@@ -341,19 +366,24 @@ int main(int argc, char **argv)
 			 each time some part ofthe window gets exposed (becomes visible) */
 
       for (int i=0; i<number_obst; i++){
-        short point1_x = (obstx[0][i] * win_width) / 500;
-        short point1_y = (obsty[0][i] * win_height) / 500;
-        short point2_x = (obstx[1][i] * win_width) / 500;
-        short point2_y = (obsty[1][i] * win_height) / 500;
-        short point3_x = (obstx[2][i] * win_width) / 500;
-        short point3_y = (obsty[2][i] * win_height) / 500;
+        short point1_x = (obstx[0][i] * win_width) / (gridSize * cellSize);
+        short point1_y = (obsty[0][i] * win_height) / (gridSize * cellSize);
+        short point2_x = (obstx[1][i] * win_width) / (gridSize * cellSize);
+        short point2_y = (obsty[1][i] * win_height) / (gridSize * cellSize);
+        short point3_x = (obstx[2][i] * win_width) / (gridSize * cellSize);
+        short point3_y = (obsty[2][i] * win_height) / (gridSize * cellSize);
         XPoint foo[] = {{point1_x,point1_y},{point2_x,point2_y},{point3_x,point3_y}};
         int npoints = sizeof(foo)/sizeof(XPoint);
 
         XFillPolygon(display_ptr, win, gc_red, foo , npoints, Convex, CoordModeOrigin);
       }
-      
+      XPoint foo1[] = {{vx[0],vy[0]},{vx[1],vy[1]},{vx[2],vy[2]}};
+      int npoints1 = sizeof(foo1)/sizeof(XPoint);
+
+      XFillPolygon(display_ptr, win, gc_yellow, foo1 , npoints1, Convex, CoordModeOrigin);
       createGrid(gridSize * cellSize, cellSize);
+
+      createRobot(vx[0],vy[0],vx[1], vy[1], vx[2], vy[2], gridSize, cellSize);
       /*
 
       for (int i=0; i<noOfObstacles; i++){
@@ -388,10 +418,10 @@ int main(int argc, char **argv)
         x = report.xbutton.x;
         y = report.xbutton.y;
 
-        short point1_x = (50 * win_width) / 500;
-        short point1_y = (50 * win_height) / 500;
-        short point2_x = (450 * win_width) / 500;
-        short point2_y = (50 * win_height) / 500;
+        short point1_x = (startx * win_width) / (gridSize * cellSize);
+        short point1_y = (starty * win_height) / (gridSize * cellSize);
+        short point2_x = (targetx * win_width) / (gridSize * cellSize);
+        short point2_y = (targety * win_height) / (gridSize * cellSize);
 
         
           XFillArc(display_ptr, win, gc_yellow,

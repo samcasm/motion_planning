@@ -90,7 +90,9 @@ bool isCollidingWithObstacle(Point x, Point y, Point z, vector<Triangle> obstacl
   struct Triangle triangle1 = {x, y, z};
   for (int i=0; i<noOfObstacles; i++){
     Triangle obstacle =  obstacles[i];
-
+    // if (triangle1.x.x > 445 && triangle1.x.y < 453){
+    //   cout << obstacle.x.x << obstacle.x.y;
+    // } 
     if (doIntersect(triangle1.x, triangle1.y, obstacle.x, obstacle.y)) return true;
     if (doIntersect(triangle1.x, triangle1.y, obstacle.x, obstacle.z)) return true;
     if (doIntersect(triangle1.x, triangle1.y, obstacle.y, obstacle.z)) return true;
