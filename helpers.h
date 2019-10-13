@@ -8,9 +8,15 @@ struct Point
 {
     int x, y;
 };
+struct floatPoint{
+    float x,y;
+};
 
 struct Triangle{
     Point x, y, z;
+};
+struct Triangle1{
+    floatPoint x, y, z;
 };
 struct Cell{
     int x,y,z;
@@ -21,15 +27,12 @@ struct queueNode{
     std::vector<Cell> pathVector;
 };
 
-struct floatPoint{
-    float x,y;
-};
 
-bool pointOnSegment(Point a, Point b, Point c);
-int orientation(Point a, Point b, Point c);
-bool doIntersect(Point a, Point b, Point x, Point y);
-bool pointInTriangle(Point x, Point a, Point b, Point c);
-bool isCollidingWithBoundary(Point a, Point b, Point c, int gridSize);
-bool isCollidingWithObstacle(Point x, Point y, Point z, vector<Triangle> obstacles, int noOfObstacles);
+bool pointOnSegment(floatPoint a, floatPoint b, floatPoint c);
+int orientation(floatPoint a, floatPoint b, floatPoint c);
+bool doIntersect(floatPoint a, floatPoint b, floatPoint x, floatPoint y);
+bool pointInTriangle(floatPoint x, floatPoint a, floatPoint b, floatPoint c);
+bool isCollidingWithBoundary(floatPoint a, floatPoint b, floatPoint c, int gridSize);
+bool isCollidingWithObstacle(floatPoint x, floatPoint y, floatPoint z, vector<Triangle1> obstacles, int noOfObstacles);
 queueNode BFS(int grid[5][5][4], Cell src, Cell dest, int gridSize, int deg, int cellSize);
 #endif

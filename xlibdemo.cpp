@@ -174,7 +174,7 @@ int main(int argc, char **argv)
   FILE *inputfile;
   int startx, starty, startphi, targetx, targety, targetphi;
   int i, finished, number_obst;
-  short obstx[3][30], obsty[3][30];
+  float obstx[3][30], obsty[3][30];
   short vx[3], vy[3];
 
   if (argc != 2){
@@ -196,7 +196,7 @@ int main(int argc, char **argv)
   }
   i=0; finished = 0;
   while (i<30 && !finished){
-    if(fscanf(inputfile, "O (%hu,%hu) (%hu,%hu) (%hu,%hu)\n", &(obstx[0][i]), &(obsty[0][i]), &(obstx[1][i]), &(obsty[1][i]), &(obstx[2][i]), &(obsty[2][i])) != 6) {
+    if(fscanf(inputfile, "O (%f,%f) (%f,%f) (%f,%f)\n", &(obstx[0][i]), &(obsty[0][i]), &(obstx[1][i]), &(obsty[1][i]), &(obstx[2][i]), &(obsty[2][i])) != 6) {
       finished = 1;
     }
     else i += 1;
@@ -210,13 +210,13 @@ int main(int argc, char **argv)
 
   int freeSpace[5][5][4];
   struct Point origin1 = {vx[0], vy[0]}, origin2 = {vx[1], vy[1]}, origin3 = {vx[2], vy[2]};
-  struct Point temp, temp1, temp2, temp3;
+  struct floatPoint temp, temp1, temp2, temp3;
   /*obstacles*/
-  std::vector<Triangle> obstacles;
+  std::vector<Triangle1> obstacles;
   
   for (int i=0; i<number_obst; i++){
-    struct Point obst_v1 = {obstx[0][i], obsty[0][i]}, obst_v2 = {obstx[1][i], obsty[1][i]}, obst_v3 = {obstx[2][i], obsty[2][i]};
-    struct Triangle obstacle_tri = {obst_v1, obst_v2, obst_v3};
+    struct floatPoint obst_v1 = {obstx[0][i], obsty[0][i]}, obst_v2 = {obstx[1][i], obsty[1][i]}, obst_v3 = {obstx[2][i], obsty[2][i]};
+    struct Triangle1 obstacle_tri = {obst_v1, obst_v2, obst_v3};
     obstacles.push_back(obstacle_tri);
   }
   
@@ -232,11 +232,11 @@ int main(int argc, char **argv)
         int deg = 90 * k;
 
         /* compute projection of rotation and translation */
-        temp1 = rotate_trans_Point(origin1, cellSize, j, i, deg);
+        temp1 = rotate_trans_Point1(origin1, cellSize, j, i, deg);
 
-        temp2 = rotate_trans_Point(origin2, cellSize, j ,i, deg);
+        temp2 = rotate_trans_Point1(origin2, cellSize, j ,i, deg);
 
-        temp3 = rotate_trans_Point(origin3, cellSize, j ,i, deg);
+        temp3 = rotate_trans_Point1(origin3, cellSize, j ,i, deg);
         
         /* check bounding condition */
         if (isCollidingWithBoundary(temp1, temp2, temp3, gridSize * cellSize))
@@ -285,8 +285,6 @@ int main(int argc, char **argv)
     cout << "invalid input";
   }
   
-
-
 
   /* opening display: basic connection to X Server */
   if ((display_ptr = XOpenDisplay(display_name)) == NULL)

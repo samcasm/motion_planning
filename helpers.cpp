@@ -8,7 +8,7 @@ using namespace std;
 /* custom functions */
 
 /* check if point b lies on the segment ab */
-bool pointOnSegment(Point a, Point b, Point c){
+bool pointOnSegment(floatPoint a, floatPoint b, floatPoint c){
   if(b.x <= max(a.x, c.x) && b.x >= min(a.x, c.x) && b.y <= max(a.y, c.y) && b.y >= min(a.y, c.y)){
     return true;
   }
@@ -19,7 +19,7 @@ bool pointOnSegment(Point a, Point b, Point c){
   returns -> 0 if the points are colinear
           -> 1 if clockwise
           -> 2 if anti-clockwise */
-int orientation(Point a, Point b, Point c){
+int orientation(floatPoint a, floatPoint b, floatPoint c){
   /* using the determinants formula */
   int res = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
 
@@ -33,7 +33,7 @@ int orientation(Point a, Point b, Point c){
 
 /* Primitives */
 /* intersection function */
-bool doIntersect(Point a, Point b, Point x, Point y){
+bool doIntersect(floatPoint a, floatPoint b, floatPoint x, floatPoint y){
 
   /* Case 1: when (a,b,x) and (a,b,y) have different orientations and 
              when (x,y,a) and (x,y,b) have different orientation */
@@ -55,7 +55,7 @@ bool doIntersect(Point a, Point b, Point x, Point y){
 
 }
 
-bool pointInTriangle(Point x, Point a, Point b, Point c){
+bool pointInTriangle(floatPoint x, floatPoint a, floatPoint b, floatPoint c){
     
     
     int or1 = orientation(x, a, b);
@@ -66,24 +66,24 @@ bool pointInTriangle(Point x, Point a, Point b, Point c){
 }
 
 
-bool isPointOutOfBounds(Point a, int gridLength){
+bool isPointOutOfBounds(floatPoint a, int gridLength){
   if (a.x < 0 || a.x > gridLength || a.y < 0 || a.y > gridLength){
     return true;
   }
   return false;
 }
 
-bool isCollidingWithBoundary(Point a, Point b, Point c, int gridLength){
+bool isCollidingWithBoundary(floatPoint a, floatPoint b, floatPoint c, int gridLength){
   if (isPointOutOfBounds(a, gridLength) || isPointOutOfBounds(b, gridLength) || isPointOutOfBounds(c, gridLength)){
     return true;
   }
   return false; 
 }
 
-bool isCollidingWithObstacle(Point x, Point y, Point z, vector<Triangle> obstacles, int noOfObstacles){
-  struct Triangle triangle1 = {x, y, z};
+bool isCollidingWithObstacle(floatPoint x, floatPoint y, floatPoint z, vector<Triangle1> obstacles, int noOfObstacles){
+  struct Triangle1 triangle1 = {x, y, z};
   for (int i=0; i<noOfObstacles; i++){
-    Triangle obstacle =  obstacles[i];
+    Triangle1 obstacle =  obstacles[i];
     // if (triangle1.x.x > 445 && triangle1.x.y < 453){
     //   cout << obstacle.x.x << obstacle.x.y;
     // } 
