@@ -442,9 +442,9 @@ int main(int argc, char **argv)
       //   }
 
       for (int i = 0; i < resultsize; i++){
-        floatPoint a1 = rotate_trans_Point1(origin1, cellSize, result.pathVector[i].x, result.pathVector[i].y, result.pathVector[i].z);
-        floatPoint a2 = rotate_trans_Point1(origin2, cellSize, result.pathVector[i].x, result.pathVector[i].y, result.pathVector[i].z);
-        floatPoint a3 = rotate_trans_Point1(origin3, cellSize, result.pathVector[i].x, result.pathVector[i].y, result.pathVector[i].z);
+        floatPoint a1 = rotate_trans_Point1(origin1, cellSize, result.pathVector[i].y, result.pathVector[i].x, result.pathVector[i].z);
+        floatPoint a2 = rotate_trans_Point1(origin2, cellSize, result.pathVector[i].y, result.pathVector[i].x, result.pathVector[i].z);
+        floatPoint a3 = rotate_trans_Point1(origin3, cellSize, result.pathVector[i].y, result.pathVector[i].x, result.pathVector[i].z);
 
         cout << "\n" << a1.x << " " << a1.y << " " << a2.x << " " << a2.y << " " << a3.x << " " << a3.y << " " << "the float points \n";
         createTriangles1(a1, a2, a3, gridSize*cellSize);
