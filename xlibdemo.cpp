@@ -154,17 +154,12 @@ floatPoint rotate_trans_Point1(Point P, int cellSize,  int x, int y, int deg){
   float cos_d = round(cos(degreeToRadian(deg*90)) * 1000.0) / 1000.0;
   float sin_d = round(sin(degreeToRadian(deg*90)) * 1000.0) / 1000.0;
 
-  cout << "\n" << P.x << P.y << " "<< x<<y<< deg << "origin\n";
-  cout << cos_d << " " << sin_d << " the angle values"; 
   float rotx = (P.x * cos_d) - (P.y * sin_d);
   float roty = (P.x * sin_d) + (P.y * cos_d);
-
-  cout << "\n" << rotx << roty << "rotated values\n";
   
   float x1 = x * cellSize;
   float y1 = y * cellSize;
 
-  cout << "\n" << x1 << " " << y1 << " x1 and x2 \n";
 
   float resx = rotx + x1;
   float resy = roty + y1;
@@ -246,18 +241,14 @@ int main(int argc, char **argv)
         /* check bounding condition */
         if (isCollidingWithBoundary(temp1, temp2, temp3, gridSize * cellSize))
         {
-          if (i==1 && j==4 && k ==1){
-            cout << "is colliding with boundary";
-          }
           freeSpace[i][j][k] = 0;
         }
         /* check obstacle collision */
         else if (isCollidingWithObstacle(temp1, temp2, temp3, obstacles, noOfObstacles))
         { 
-          if (i==1 && j==4 && k ==1){
-            cout << "\nis colliding with obstacle "<< temp1.x << " " << temp1.y << " " << temp2.x << " " << temp2.y << " " << temp3.x << " " << temp3.y << "\n";
-          }
-          freeSpace[i][j][k] = 0;
+          cout << "\n" << temp1.x << " " << temp1.y << " " << temp2.x << " " << temp2.y << " " << temp3.x << " " << temp3.y << " colliding points\n";
+          
+          freeSpace[i][j][k] = 7;
         }
         else{
           freeSpace[i][j][k] = 1;
@@ -288,7 +279,6 @@ int main(int argc, char **argv)
   if (result.dist != -1){
     resultsize = result.pathVector.size();
     for (int i=0; i< resultsize; i++){
-      cout << "\nThe result\n";
       cout << result.pathVector[i].x << " " << result.pathVector[i].y << " " << result.pathVector[i].z;
     }
   }else{
@@ -423,30 +413,29 @@ int main(int argc, char **argv)
 
       createRobot(vx[0],vy[0],vx[1], vy[1], vx[2], vy[2], startx, starty, gridSize, cellSize);
 
-      //  for (int i = 0; i < gridSize; i++)
-      //   {
-      //     for (int j = 0; j < gridSize; j++)
-      //     {
-      //       for (int k = 0; k < degrees; k++)
-      //       {
-      //         if( freeSpace[i][j][k] == 1){
-      //           Point p1 = {j*2 + origin1.x, i*2 + origin1.y};
-      //           Point p2 = {j*2 + origin2.x, i*2 + origin2.y};
-      //           Point p3 = {j*2 + origin3.x, i*2 + origin3.y};
-      //           createTriangles(p1,p2,p3, gridSize*cellSize);
+       for (int i = 0; i < gridSize; i++)
+        {
+          for (int j = 0; j < gridSize; j++)
+          {
+            for (int k = 0; k < degrees; k++)
+            {
+              if( freeSpace[i][j][k] == 7){
+                floatPoint p1 = rotate_trans_Point1(origin1, cellSize, j, i, k );
+                floatPoint p2 = rotate_trans_Point1(origin2, cellSize, j, i, k );
+                floatPoint p3 = rotate_trans_Point1(origin3, cellSize, j, i, k );
+                createTriangles1(p1,p2,p3, gridSize*cellSize);
 
-      //         }
+              }
 
-      //       }
-      //     }
-      //   }
+            }
+          }
+        }
 
       for (int i = 0; i < resultsize; i++){
-        floatPoint a1 = rotate_trans_Point1(origin1, cellSize, result.pathVector[i].y, result.pathVector[i].x, result.pathVector[i].z);
-        floatPoint a2 = rotate_trans_Point1(origin2, cellSize, result.pathVector[i].y, result.pathVector[i].x, result.pathVector[i].z);
-        floatPoint a3 = rotate_trans_Point1(origin3, cellSize, result.pathVector[i].y, result.pathVector[i].x, result.pathVector[i].z);
+        floatPoint a1 = rotate_trans_Point1(origin1, cellSize, result.pathVector[i].x, result.pathVector[i].y, result.pathVector[i].z);
+        floatPoint a2 = rotate_trans_Point1(origin2, cellSize, result.pathVector[i].x, result.pathVector[i].y, result.pathVector[i].z);
+        floatPoint a3 = rotate_trans_Point1(origin3, cellSize, result.pathVector[i].x, result.pathVector[i].y, result.pathVector[i].z);
 
-        cout << "\n" << a1.x << " " << a1.y << " " << a2.x << " " << a2.y << " " << a3.x << " " << a3.y << " " << "the float points \n";
         createTriangles1(a1, a2, a3, gridSize*cellSize);
       }
 

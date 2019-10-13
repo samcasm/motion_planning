@@ -65,12 +65,6 @@ bool pointInTriangle(Point x, Point a, Point b, Point c){
     return or1 == or2 ? (or2 == or3 ? true : false) : false ;
 }
 
-int computeNewX_Y(int x_y, int deg, char selection){
-  if (selection == 'x'){
-    return ( ((x_y * 5) * cos(deg)) - ((x_y * 5) * sin(deg)) ) + (x_y  * 5);
-  }
-  return ( ((x_y * 5) * sin(deg)) + ((x_y) * cos(deg)) ) + (x_y * 5);
-}
 
 bool isPointOutOfBounds(Point a, int gridLength){
   if (a.x < 0 || a.x > gridLength || a.y < 0 || a.y > gridLength){
@@ -198,7 +192,7 @@ queueNode BFS(int grid[][5][4], Cell src, Cell dest, int gridSize, int degrees, 
 
         } 
     }
-    cout << "Could not find a path";
+    cout << "Could not find a path\n";
 
   }
 
