@@ -8,6 +8,7 @@ struct Point
 {
     int x, y;
 };
+
 struct Triangle{
     Point x, y, z;
 };

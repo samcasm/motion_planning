@@ -72,33 +72,33 @@ Point fix_neg_points(Point p){
 }
 
 
-void createTriangles(Point point1, Point point2, Point point3, int gridLength, int type)
+void createTriangles(Point point1, Point point2, Point point3, int gridLength)
 {
-  if (type == 0) {
-    point1 = fix_neg_points(point1);
-    point2 = fix_neg_points(point2);
-    point3 = fix_neg_points(point3);
-  }
+  // if (type == 0) {
+  //   point1 = fix_neg_points(point1);
+  //   point2 = fix_neg_points(point2);
+  //   point3 = fix_neg_points(point3);
+  // }
   /* type == 1 for obstacles(red), else 0(yellow) */ 
-  XDrawLine(display_ptr, win, type == 1? gc_red: gc_yellow, point1.x * win_width / gridLength, point1.y * win_height / gridLength,
+  XDrawLine(display_ptr, win, gc_red, point1.x * win_width / gridLength, point1.y * win_height / gridLength,
             point2.x * win_width / gridLength, point2.y * win_height / gridLength);
 
-  XDrawLine(display_ptr, win, type == 1? gc_red: gc_yellow, point2.x * win_width / gridLength, point2.y * win_height / gridLength,
+  XDrawLine(display_ptr, win, gc_red, point2.x * win_width / gridLength, point2.y * win_height / gridLength,
             point3.x * win_width / gridLength, point3.y * win_height / gridLength);
 
-  XDrawLine(display_ptr, win, type == 1? gc_red: gc_yellow, point3.x * win_width / gridLength, point3.y * win_height / gridLength,
+  XDrawLine(display_ptr, win, gc_red, point3.x * win_width / gridLength, point3.y * win_height / gridLength,
             point1.x * win_width / gridLength, point1.y * win_height / gridLength);
 }
 
-void createRobot(short x0,short y0,short x1,short y1,short x2,short y2, int gridSize, int cellSize)
+void createRobot(short x0,short y0,short x1,short y1,short x2,short y2, int startx, int starty, int gridSize, int cellSize)
 {
   
-  short point1_x = (x0 * win_width) / (gridSize * cellSize);
-  short point1_y = (y0 * win_height) / (gridSize * cellSize);
-  short point2_x = (x1 * win_width) / (gridSize * cellSize);
-  short point2_y = (y1 * win_height) / (gridSize * cellSize);
-  short point3_x = (x2 * win_width) / (gridSize * cellSize);
-  short point3_y = (y2 * win_height) / (gridSize * cellSize);
+  short point1_x = ((x0 + startx) * win_width) / (gridSize * cellSize);
+  short point1_y = ((y0 + starty) * win_height) / (gridSize * cellSize);
+  short point2_x = ((x1 + startx) * win_width) / (gridSize * cellSize);
+  short point2_y = ((y1 + starty) * win_height) / (gridSize * cellSize);
+  short point3_x = ((x2 + startx) * win_width) / (gridSize * cellSize);
+  short point3_y = ((y2 + starty) * win_height) / (gridSize * cellSize);
   
   XPoint foo[] = {{point1_x,point1_y},{point2_x,point2_y},{point3_x,point3_y}};
   int npoints = sizeof(foo)/sizeof(XPoint);
@@ -110,29 +110,22 @@ float degreeToRadian(int deg){
   return deg * PI / 180.0;
 }
 
-Cell convertPointToCell(int x, int y, int deg){
-    int var1 = round(x/5);
-    int var2 = round(y/5);
-    int var3 = round(deg/10);
+Cell convertPointToCell(int x, int y, int deg, int cellSize){
+    int var1 = x/cellSize;
+    int var2 = y/cellSize;
+    int var3 = deg/90;
 
     struct Cell currcell = {var1, var2, var3};
     return currcell;
 }
 
-Point rotate_trans_Point(Point P, int x, int y, int deg){
+Point rotate_trans_Point(Point P, int cellSize,  int x, int y, int deg){
   float rotx = (P.x * cos(degreeToRadian(deg))) - (P.y * sin(degreeToRadian(deg)));
   float roty = (P.x * sin(degreeToRadian(deg))) + (P.y * cos(degreeToRadian(deg)));
 
-  /*
-  cout << P.x * cos(degreeToRadian(deg)) << "  "  << P.y * sin(degreeToRadian(deg)) << "\n";
-  cout << P.x * sin(degreeToRadian(deg)) << "  "  << P.y * cos(degreeToRadian(deg)) << "\n";
-  cout << P.x << " " << P.y << " " <<  deg << " actual points";
-  cout << rotx << " " << roty << " " << "rotated points";
-  cout << resx << " " << resy <<" finally\n" ;
-  */
   
-  float x1 = x * 5;
-  float y1 = y * 5;
+  float x1 = x * cellSize;
+  float y1 = y * cellSize;
 
 
   int resx = round(rotx) + x1;
@@ -183,7 +176,7 @@ int main(int argc, char **argv)
   int degrees = 4;
 
   int freeSpace[5][5][4];
-  struct Point origin = {0, 0}, origin1 = {vx[0], vy[0]}, origin2 = {vx[1], vy[1]}, origin3 = {vx[2], vy[2]};
+  struct Point origin1 = {vx[0], vy[0]}, origin2 = {vx[1], vy[1]}, origin3 = {vx[2], vy[2]};
   struct Point temp, temp1, temp2, temp3;
   /*obstacles*/
   std::vector<Triangle> obstacles;
@@ -203,14 +196,14 @@ int main(int argc, char **argv)
       for (int k = 0; k < degrees; k++)
       {
         // change as per the degrees
-        int deg = 45 * k;
+        int deg = 90 * k;
 
         /* compute projection of rotation and translation */
-        temp1 = rotate_trans_Point(origin1, j, i, deg);
+        temp1 = rotate_trans_Point(origin1, cellSize, j, i, deg);
 
-        temp2 = rotate_trans_Point(origin2,j ,i, deg);
+        temp2 = rotate_trans_Point(origin2, cellSize, j ,i, deg);
 
-        temp3 = rotate_trans_Point(origin3, j ,i, deg);
+        temp3 = rotate_trans_Point(origin3, cellSize, j ,i, deg);
         
         /* check bounding condition */
         if (isCollidingWithBoundary(temp1, temp2, temp3, gridSize * cellSize))
@@ -225,7 +218,7 @@ int main(int argc, char **argv)
         else{
           freeSpace[i][j][k] = 1;
         }
-          
+        
 
         /*cout << freeSpace[i][j][k] << "   " ;*/
 
@@ -233,27 +226,16 @@ int main(int argc, char **argv)
     }
   }
 
-  Point res = rotate_trans_Point(origin1, 2,2, 10);
-  Point res1 = rotate_trans_Point(origin1, 2,2, 20);
-  Point res2 = rotate_trans_Point(origin1, 2,2, 30);
-  Point res3 = rotate_trans_Point(origin1, 2,2, 40);
-  Point res4 = rotate_trans_Point(origin1, 2,2, 50);
 
-  cout << res.x << " " << res.y << " \n";
-  cout << res1.x << " " << res1.y << " \n";
-  cout << res2.x << " " << res2.y << " \n";
-  cout << res3.x << " " << res3.y << " \n";
-  cout << res4.x << " " << res4.y << " \n";
-
-  struct Cell src = convertPointToCell(startx, starty, startphi);
-  struct Cell dest = convertPointToCell(targetx, targety, targetphi);
+  struct Cell src = convertPointToCell(startx, starty, startphi, cellSize);
+  struct Cell dest = convertPointToCell(targetx, targety, targetphi, cellSize);
 
   cout << src.x << " " << src.y << " " << src.z << "the source\n";
   cout << dest.x << " " << dest.y << " " << dest.z << "the destination\n";
   cout << freeSpace[src.x][src.y][src.z] << " " << freeSpace[dest.x][dest.y][dest.z] << "\n";
   
-  // int result = BFS(freeSpace, src, dest, gridSize, degrees, cellSize);
-  // cout << result << "the result \n";
+  int result = BFS(freeSpace, src, dest, gridSize, degrees, cellSize);
+  cout << result << "the result \n";
 
 
 
@@ -377,13 +359,33 @@ int main(int argc, char **argv)
 
         XFillPolygon(display_ptr, win, gc_red, foo , npoints, Convex, CoordModeOrigin);
       }
-      XPoint foo1[] = {{vx[0],vy[0]},{vx[1],vy[1]},{vx[2],vy[2]}};
-      int npoints1 = sizeof(foo1)/sizeof(XPoint);
-
-      XFillPolygon(display_ptr, win, gc_yellow, foo1 , npoints1, Convex, CoordModeOrigin);
+      
       createGrid(gridSize * cellSize, cellSize);
 
-      createRobot(vx[0],vy[0],vx[1], vy[1], vx[2], vy[2], gridSize, cellSize);
+      createRobot(vx[0],vy[0],vx[1], vy[1], vx[2], vy[2], startx, starty, gridSize, cellSize);
+
+       for (int i = 0; i < gridSize; i++)
+        {
+          for (int j = 0; j < gridSize; j++)
+          {
+            for (int k = 0; k < degrees; k++)
+            {
+              if( freeSpace[i][j][k] == 1){
+                Point p1 = {j*2 + origin1.x, i*2 + origin1.y};
+                Point p2 = {j*2 + origin2.x, i*2 + origin2.y};
+                Point p3 = {j*2 + origin3.x, i*2 + origin3.y};
+                createTriangles(p1,p2,p3, gridSize*cellSize);
+
+              }
+
+            }
+          }
+        }
+
+      // Point p1 = {5,6};
+      // Point p2 = {5,8};
+      // Point p3 = {8,5};
+      // createTriangles(p1, p2, p3, gridSize * cellSize);
       /*
 
       for (int i=0; i<noOfObstacles; i++){
@@ -424,14 +426,14 @@ int main(int argc, char **argv)
         short point2_y = (targety * win_height) / (gridSize * cellSize);
 
         
-          XFillArc(display_ptr, win, gc_yellow,
+          XFillArc(display_ptr, win, gc_grey,
                    point1_x, point1_y,
-                   win_height / 20, win_height / 20, 0, 360 * 64);
+                   win_height / 50, win_height / 50, 0, 360 * 64);
           
         
-          XFillArc(display_ptr, win, gc_yellow,
+          XFillArc(display_ptr, win, gc_grey,
                    point2_x, point2_y,
-                   win_height / 20, win_height / 20, 0, 360 * 64);
+                   win_height / 50, win_height / 50, 0, 360 * 64);
       }
       break;
     default:

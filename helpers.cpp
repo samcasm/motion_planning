@@ -123,23 +123,22 @@ bool isCollidingWithObstacle(Point x, Point y, Point z, vector<Triangle> obstacl
   return false;
 }
 
-bool isValid(int grid[][100][36],int x, int y, int z, int gridLength, int degrees){
+bool isValid(int grid[][5][4],int x, int y, int z, int gridLength, int degrees){
 
     int size1 = gridLength;
     int size2 = gridLength;
     int size3 = degrees;
-  if (x >= size1 || x < 0 
-      || y >= size2 || y < 0 
-      || z >= size3 || z < 0 
-      || grid[x][y][z] != 1) {
-          return false;    
+    if (x < size1 && x >= 0 && y < size2 && y >= 0 && z < size3 && z >= 0 && grid[x][y][z] == 1) {
+        cout << x << y << z << "   " << size1 << " " << size2 << " " << size3 << " " << grid[x][y][z] << " passing condition\n";
+          return true;    
     }
-    return true;
+    cout << x << y << z << "   " << size1 << " " << size2 << " " << size3 << " " << grid[x][y][z] << " failing condition\n";
+    return false;
 }
 
-int BFS(int grid[][100][36], Cell src, Cell dest, int gridSize, int deg, int cellSize){
+int BFS(int grid[][5][4], Cell src, Cell dest, int gridSize, int degrees, int cellSize){
 
-    if(!isValid(grid, src.x, src.y, src.z, gridSize, deg ) || !isValid(grid, dest.x, dest.y, dest.z ,gridSize, deg)){
+    if(!isValid(grid, src.x, src.y, src.z, gridSize, degrees ) || !isValid(grid, dest.x, dest.y, dest.z ,gridSize, degrees)){
       return -1;
     }
     
@@ -147,7 +146,7 @@ int BFS(int grid[][100][36], Cell src, Cell dest, int gridSize, int deg, int cel
     int d2[6] = {0, 0, 1, -1, 0, 0};    
     int d3[6] = {0, 0, 0, 0, 1, -1};    
     
-    bool visited[gridSize][gridSize][deg];
+    bool visited[gridSize][gridSize][degrees];
     memset(visited, false, sizeof(visited) ); 
 
     visited[src.x][src.y][src.z] = true;
@@ -166,6 +165,7 @@ int BFS(int grid[][100][36], Cell src, Cell dest, int gridSize, int deg, int cel
   
         // If we have reached the destination cell, 
         // we are done 
+        cout << pt.x << " " << pt.y << " the cell\n";
         if (pt.x == dest.x && pt.y == dest.y && pt.z == dest.z) {
             /*for (int i=0; i<curr.pathVector.size(); i++){
               cout << curr.pathVector[i].x << curr.pathVector[i].y << curr.pathVector[i].z <<" \n";
@@ -176,16 +176,16 @@ int BFS(int grid[][100][36], Cell src, Cell dest, int gridSize, int deg, int cel
         // Otherwise dequeue the front cell in the queue 
         // and enqueue its adjacent cells 
         q.pop(); 
-  
-        for (int i = 0; i < sizeof(d1); i++) 
+        for (int i = 0; i < (sizeof(d1)/sizeof(int)); i++) 
         { 
             int row = pt.x + d1[i]; 
             int col = pt.y + d2[i]; 
             int deg = pt.z + d3[i];
+
               
             // if adjacent cell is valid, has path and 
             // not visited yet, enqueue it. 
-            if (isValid(grid, row, col, deg, gridSize, deg) && grid[row][col][deg] &&  
+            if (isValid(grid, row, col, deg, gridSize, degrees) && grid[row][col][deg] &&  
                !visited[row][col][deg]) 
             { 
                 // mark cell as visited and enqueue it 
