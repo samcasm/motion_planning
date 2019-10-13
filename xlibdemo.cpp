@@ -234,8 +234,12 @@ int main(int argc, char **argv)
   cout << dest.x << " " << dest.y << " " << dest.z << "the destination\n";
   cout << freeSpace[src.x][src.y][src.z] << " " << freeSpace[dest.x][dest.y][dest.z] << "\n";
   
-  int result = BFS(freeSpace, src, dest, gridSize, degrees, cellSize);
-  cout << result << "the result \n";
+  queueNode result = BFS(freeSpace, src, dest, gridSize, degrees, cellSize);
+  int resultsize = result.pathVector.size();
+  for (int i=0; i< resultsize; i++){
+    cout << "\nThe result\n" << "";
+    cout << result.pathVector[i].x << " " << result.pathVector[i].y << " " << result.pathVector[i].z;
+  }
 
 
 

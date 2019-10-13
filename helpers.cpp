@@ -129,17 +129,16 @@ bool isValid(int grid[][5][4],int x, int y, int z, int gridLength, int degrees){
     int size2 = gridLength;
     int size3 = degrees;
     if (x < size1 && x >= 0 && y < size2 && y >= 0 && z < size3 && z >= 0 && grid[x][y][z] == 1) {
-        cout << x << y << z << "   " << size1 << " " << size2 << " " << size3 << " " << grid[x][y][z] << " passing condition\n";
           return true;    
     }
-    cout << x << y << z << "   " << size1 << " " << size2 << " " << size3 << " " << grid[x][y][z] << " failing condition\n";
     return false;
 }
 
-int BFS(int grid[][5][4], Cell src, Cell dest, int gridSize, int degrees, int cellSize){
+queueNode BFS(int grid[][5][4], Cell src, Cell dest, int gridSize, int degrees, int cellSize){
 
     if(!isValid(grid, src.x, src.y, src.z, gridSize, degrees ) || !isValid(grid, dest.x, dest.y, dest.z ,gridSize, degrees)){
-      return -1;
+      struct queueNode node = {src, -1};
+      return node;
     }
     
     int d1[6] = {1, -1, 0, 0, 0, 0};    
@@ -165,12 +164,11 @@ int BFS(int grid[][5][4], Cell src, Cell dest, int gridSize, int degrees, int ce
   
         // If we have reached the destination cell, 
         // we are done 
-        cout << pt.x << " " << pt.y << " the cell\n";
         if (pt.x == dest.x && pt.y == dest.y && pt.z == dest.z) {
             /*for (int i=0; i<curr.pathVector.size(); i++){
               cout << curr.pathVector[i].x << curr.pathVector[i].y << curr.pathVector[i].z <<" \n";
             }*/
-            return curr.dist; 
+            return curr; 
         }
   
         // Otherwise dequeue the front cell in the queue 
