@@ -21,6 +21,10 @@ struct queueNode{
     std::vector<Cell> pathVector;
 };
 
+struct floatPoint{
+    float x,y;
+};
+
 bool pointOnSegment(Point a, Point b, Point c);
 int orientation(Point a, Point b, Point c);
 bool doIntersect(Point a, Point b, Point x, Point y);
