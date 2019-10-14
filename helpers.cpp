@@ -173,9 +173,7 @@ queueNode BFS(int grid[][100][36], Cell src, Cell dest, int gridSize, int degree
               
             // if adjacent cell is valid, has path and 
             // not visited yet, enqueue it. 
-            // if (isValid(grid, row, col, deg, gridSize, degrees)){
-
-            // }
+            
             if (isValid(grid, row, col, deg, gridSize, degrees) && grid[row][col][deg] &&  
                !visited[row][col][deg]) 
             { 

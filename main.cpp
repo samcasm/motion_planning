@@ -355,6 +355,9 @@ int main(int argc, char **argv)
       // draw robot at source
       createRobot(vx[0],vy[0],vx[1], vy[1], vx[2], vy[2], startx, starty, gridSize, cellSize);
 
+      // draw robot at destination
+      createRobot(vx[0],vy[0],vx[1], vy[1], vx[2], vy[2], targetx, targety, gridSize, cellSize);
+
       /*           code to draw the collision region on the grid where the robot cannot move       */
 
       //  for (int i = 0; i < gridSize; i++)
