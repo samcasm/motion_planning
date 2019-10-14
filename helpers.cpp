@@ -5,7 +5,7 @@
 #include <queue>
 using namespace std;
 
-/* custom functions */
+/* all helper functions to do with the BFS traversal */
 
 /* check if point b lies on the segment ab */
 bool pointOnSegment(floatPoint a, floatPoint b, floatPoint c){
@@ -157,9 +157,7 @@ queueNode BFS(int grid[][100][36], Cell src, Cell dest, int gridSize, int degree
         // If we have reached the destination cell, 
         // we are done 
         if (pt.x == dest.x && pt.y == dest.y && pt.z == dest.z) {
-            /*for (int i=0; i<curr.pathVector.size(); i++){
-              cout << curr.pathVector[i].x << curr.pathVector[i].y << curr.pathVector[i].z <<" \n";
-            }*/
+            
             return curr; 
         }
   

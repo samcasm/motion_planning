@@ -1,7 +1,4 @@
 /* compiles with command line  gcc xlibdemo.c -lX11 -lm -L/usr/X11R6/lib 
-   sudo apt install g++
-   sudo apt install libx11-dev
-   install c/c++ intellisense extension 
 */
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -37,13 +34,13 @@ char *icon_name_string = (char *)"Icon for Example Window";
 
 XEvent report;
 
-GC gc, gc_yellow, gc_red, gc_grey;
+GC gc, gc_yellow, gc_red, gc_grey, gc_green;
 unsigned long valuemask = 0;
-XGCValues gc_values, gc_yellow_values, gc_red_values, gc_grey_values;
+XGCValues gc_values, gc_yellow_values, gc_red_values, gc_grey_values, gc_green_values;
 Colormap color_map;
 XColor tmp_color1, tmp_color2;
 
-/* custom xlib functions */
+/* *******       custom functions       *******/
 
 void createGrid(int gridLength, int cellSize)
 {
@@ -56,49 +53,17 @@ void createGrid(int gridLength, int cellSize)
   }
 }
 
-Point fix_neg_points(Point p){
-  struct Point newp;
-  if (p.x <= 0 && p.y <= 0){
-    newp = {0,0};
-  }else if (p.x < 0 and p.y > 0){
-    newp = {0, p.y};
-  }else if (p.x > 0 and p.y < 0){
-    newp = {p.x, 0};
-  }else{
-    newp = {p.x, p.y};
-  }
-  return newp;
-}
-
-
-void createTriangles(Point point1, Point point2, Point point3, int gridLength)
-{
-  // if (type == 0) {
-  //   point1 = fix_neg_points(point1);
-  //   point2 = fix_neg_points(point2);
-  //   point3 = fix_neg_points(point3);
-  // }
-  /* type == 1 for obstacles(red), else 0(yellow) */ 
-  XDrawLine(display_ptr, win, gc_red, point1.x * win_width / gridLength, point1.y * win_height / gridLength,
-            point2.x * win_width / gridLength, point2.y * win_height / gridLength);
-
-  XDrawLine(display_ptr, win, gc_red, point2.x * win_width / gridLength, point2.y * win_height / gridLength,
-            point3.x * win_width / gridLength, point3.y * win_height / gridLength);
-
-  XDrawLine(display_ptr, win, gc_red, point3.x * win_width / gridLength, point3.y * win_height / gridLength,
-            point1.x * win_width / gridLength, point1.y * win_height / gridLength);
-}
 
 void createTriangles1(floatPoint point1, floatPoint point2, floatPoint point3, int gridLength)
 {
   
-  XDrawLine(display_ptr, win, gc_red, point1.x * win_width / gridLength, point1.y * win_height / gridLength,
+  XDrawLine(display_ptr, win, gc_green, point1.x * win_width / gridLength, point1.y * win_height / gridLength,
             point2.x * win_width / gridLength, point2.y * win_height / gridLength);
 
-  XDrawLine(display_ptr, win, gc_red, point2.x * win_width / gridLength, point2.y * win_height / gridLength,
+  XDrawLine(display_ptr, win, gc_green, point2.x * win_width / gridLength, point2.y * win_height / gridLength,
             point3.x * win_width / gridLength, point3.y * win_height / gridLength);
 
-  XDrawLine(display_ptr, win, gc_red, point3.x * win_width / gridLength, point3.y * win_height / gridLength,
+  XDrawLine(display_ptr, win, gc_green, point3.x * win_width / gridLength, point3.y * win_height / gridLength,
             point1.x * win_width / gridLength, point1.y * win_height / gridLength);
 }
 
@@ -131,25 +96,6 @@ Cell convertPointToCell(int x, int y, int deg, int cellSize){
     return currcell;
 }
 
-Point rotate_trans_Point(Point P, int cellSize,  int x, int y, int deg){
-  float cos_d = round(cos(degreeToRadian(deg)) * 1000.0) / 1000.0;
-  float sin_d = round(sin(degreeToRadian(deg)) * 1000.0) / 1000.0;
-
-  float rotx = (P.x * cos_d) - (P.y * sin_d);
-  float roty = (P.x * sin_d) + (P.y * cos_d);
-
-  
-  float x1 = x * cellSize;
-  float y1 = y * cellSize;
-
-
-  int resx = round(rotx) + x1;
-  int resy = round(roty) + y1;
-  
-  struct Point newpoint = {resx, resy};
-  return newpoint;
-}
-
 floatPoint rotate_trans_Point1(Point P, int cellSize,  int x, int y, int deg){
   float cos_d = round(cos(degreeToRadian(deg*10)) * 1000.0) / 1000.0;
   float sin_d = round(sin(degreeToRadian(deg*10)) * 1000.0) / 1000.0;
@@ -167,6 +113,8 @@ floatPoint rotate_trans_Point1(Point P, int cellSize,  int x, int y, int deg){
   struct floatPoint newpoint = {resx, resy};
   return newpoint;
 }
+
+
 
 int main(int argc, char **argv)
 {
@@ -204,6 +152,7 @@ int main(int argc, char **argv)
   number_obst = i;
   cout << "found " << i <<  " obstacles. so far ok\n";
 
+  // memory allocation into the grid freeSpace
   int gridSize = 100;
   int cellSize = 5;
   int degrees = 36;
@@ -211,6 +160,7 @@ int main(int argc, char **argv)
   int freeSpace[100][100][36];
   struct Point origin1 = {vx[0], vy[0]}, origin2 = {vx[1], vy[1]}, origin3 = {vx[2], vy[2]};
   struct floatPoint temp, temp1, temp2, temp3;
+
   /*obstacles*/
   std::vector<Triangle1> obstacles;
   
@@ -228,7 +178,6 @@ int main(int argc, char **argv)
     {
       for (int k = 0; k < degrees; k++)
       {
-        // change as per the degrees
 
         /* compute projection of rotation and translation */
         temp1 = rotate_trans_Point1(origin1, cellSize, j, i, k);
@@ -245,45 +194,25 @@ int main(int argc, char **argv)
         /* check obstacle collision */
         else if (isCollidingWithObstacle(temp1, temp2, temp3, obstacles, noOfObstacles))
         { 
-          // if (i == 3 && j == 2 && k == 2){
-          // cout << "\n" << temp1.x << " " << temp1.y << " " << temp2.x << " " << temp2.y << " " << temp3.x << " " << temp3.y << " colliding points\n";
-
-          // }
           
           freeSpace[j][i][k] = 0;
         }
         else{
           freeSpace[j][i][k] = 1;
         }
-        
-
-
-        /*cout << freeSpace[i][j][k] << "   " ;*/
 
       }
     }
   }
 
-  cout << freeSpace[2][3][2] << "< ---";
-  
-  // floatPoint resres = rotate_trans_Point1(origin1, cellSize, 1, 1, 90);
-  // cout << origin1.x << " " << origin1.y ;
-  // cout << "\n" << resres.x << " " << resres.y << "this is the final showdown\n";
-
+  // convert source and destination points to corresponding cells and perform BFS on them
   struct Cell src = convertPointToCell(startx, starty, startphi, cellSize);
   struct Cell dest = convertPointToCell(targetx, targety, targetphi, cellSize);
-
-  cout << src.x << " " << src.y << " " << src.z << "the source\n";
-  cout << dest.x << " " << dest.y << " " << dest.z << "the destination\n";
-  cout << freeSpace[src.x][src.y][src.z] << " " << freeSpace[dest.x][dest.y][dest.z] << "\n";
   
   int resultsize = 0;
   queueNode result = BFS(freeSpace, src, dest, gridSize, degrees, cellSize);
   if (result.dist != -1){
     resultsize = result.pathVector.size();
-    for (int i=0; i< resultsize; i++){
-      cout << result.pathVector[i].x << " " << result.pathVector[i].y << " " << result.pathVector[i].z;
-    }
   }else{
     cout << "invalid input";
   }
@@ -355,7 +284,17 @@ int main(int argc, char **argv)
   gc = XCreateGC(display_ptr, win, valuemask, &gc_values);
   XSetForeground(display_ptr, gc, BlackPixel(display_ptr, screen_num));
   XSetLineAttributes(display_ptr, gc, 1, LineSolid, CapRound, JoinRound);
-  /* and three other graphics contexts, to draw in yellow and red and grey*/
+  /* and three other graphics contexts, to draw in yellow and red and grey and green*/
+  gc_green = XCreateGC(display_ptr, win, valuemask, &gc_green_values);
+  XSetLineAttributes(display_ptr, gc_green, 2, LineSolid, CapRound, JoinRound);
+  if (XAllocNamedColor(display_ptr, color_map, "dark green",
+                       &tmp_color1, &tmp_color2) == 0)
+  {
+    printf("failed to get color green\n");
+    exit(-1);
+  }
+  else
+    XSetForeground(display_ptr, gc_green, tmp_color1.pixel);
   gc_yellow = XCreateGC(display_ptr, win, valuemask, &gc_yellow_values);
   XSetLineAttributes(display_ptr, gc_yellow, 2, LineSolid, CapRound, JoinRound);
   if (XAllocNamedColor(display_ptr, color_map, "yellow",
@@ -397,6 +336,7 @@ int main(int argc, char **argv)
       /* (re-)draw the example figure. This event happens
 			 each time some part ofthe window gets exposed (becomes visible) */
 
+      // draw all obstacles 
       for (int i=0; i<number_obst; i++){
         short point1_x = (obstx[0][i] * win_width) / (gridSize * cellSize);
         short point1_y = (obsty[0][i] * win_height) / (gridSize * cellSize);
@@ -412,7 +352,10 @@ int main(int argc, char **argv)
       
       createGrid(gridSize * cellSize, cellSize);
 
+      // draw robot at source
       createRobot(vx[0],vy[0],vx[1], vy[1], vx[2], vy[2], startx, starty, gridSize, cellSize);
+
+      /*           code to draw the collision region on the grid where the robot cannot move       */
 
       //  for (int i = 0; i < gridSize; i++)
       //   {
@@ -432,13 +375,7 @@ int main(int argc, char **argv)
       //     }
       //   }
 
-      // if(freeSpace[2][3][2] == 7){
-      //   floatPoint p1 = rotate_trans_Point1(origin1, cellSize, 3, 2, 2 );
-      //   floatPoint p2 = rotate_trans_Point1(origin2, cellSize, 3, 2, 2 );
-      //   floatPoint p3 = rotate_trans_Point1(origin3, cellSize, 3, 2, 2 );
-      //   cout << "nooooo" ;
-      //   createTriangles1(p1,p2,p3, gridSize*cellSize);
-      // }
+      // draw the shortest path that is found from src to dest 
 
       for (int i = 0; i < resultsize; i++){
         floatPoint a1 = rotate_trans_Point1(origin1, cellSize, result.pathVector[i].x, result.pathVector[i].y, result.pathVector[i].z);
@@ -448,16 +385,6 @@ int main(int argc, char **argv)
         createTriangles1(a1, a2, a3, gridSize*cellSize);
       }
 
-      
-      /*              
-      XDrawLine(display_ptr, win, gc_red, win_width / 4, 2 * win_height / 3,
-                3 * win_width / 4, 2 * win_height / 3);
-      XFillArc(display_ptr, win, gc_grey, win_width / 2 - win_height / 6,
-               win_height / 3,
-               win_height / 3, win_height / 3, 0, 360 * 64);
-      XDrawArc(display_ptr, win, gc_yellow, win_width / 4, win_height / 3,
-               win_height / 6, win_height / 3, 90 * 64, 180 * 64);
-     */
     }
     break;
     case ConfigureNotify:
