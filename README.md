@@ -2,6 +2,8 @@ README:
 
 This projects demonstrates a robot(green triangle) that maneuvers through a series of obstacles(red polygons), avoiding any collisions, to reach the desired destination in the shortest path using Breadth First Search(BFS) graph algorithm.
 
+The program is written in C++ and the output rendered using XLib graphics library interface.
+
 REQUIREMENTS:
 
 1. Gcc compiler and xlib interface installed.
