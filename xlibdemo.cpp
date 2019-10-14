@@ -125,7 +125,7 @@ double degreeToRadian(double deg){
 Cell convertPointToCell(int x, int y, int deg, int cellSize){
     int var1 = x/cellSize;
     int var2 = y/cellSize;
-    int var3 = deg/90;
+    int var3 = deg/10;
 
     struct Cell currcell = {var1, var2, var3};
     return currcell;
@@ -151,8 +151,8 @@ Point rotate_trans_Point(Point P, int cellSize,  int x, int y, int deg){
 }
 
 floatPoint rotate_trans_Point1(Point P, int cellSize,  int x, int y, int deg){
-  float cos_d = round(cos(degreeToRadian(deg*90)) * 1000.0) / 1000.0;
-  float sin_d = round(sin(degreeToRadian(deg*90)) * 1000.0) / 1000.0;
+  float cos_d = round(cos(degreeToRadian(deg*10)) * 1000.0) / 1000.0;
+  float sin_d = round(sin(degreeToRadian(deg*10)) * 1000.0) / 1000.0;
 
   float rotx = (P.x * cos_d) - (P.y * sin_d);
   float roty = (P.x * sin_d) + (P.y * cos_d);
@@ -204,11 +204,11 @@ int main(int argc, char **argv)
   number_obst = i;
   cout << "found " << i <<  " obstacles. so far ok\n";
 
-  int gridSize = 5;
-  int cellSize = 2;
-  int degrees = 4;
+  int gridSize = 100;
+  int cellSize = 5;
+  int degrees = 36;
 
-  int freeSpace[5][5][4];
+  int freeSpace[100][100][36];
   struct Point origin1 = {vx[0], vy[0]}, origin2 = {vx[1], vy[1]}, origin3 = {vx[2], vy[2]};
   struct floatPoint temp, temp1, temp2, temp3;
   /*obstacles*/

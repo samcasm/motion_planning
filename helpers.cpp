@@ -42,10 +42,7 @@ bool doIntersect(floatPoint a, floatPoint b, floatPoint x, floatPoint y){
   int or4 = orientation(x,y,b);
 
   if (or1 != or2 && or3 != or4){
-  if (a.x == 3 && a.y == 7 && b.x == 5 && b.y == 7){
-      cout << a.x << " " << a.y << " " << b.x << " " << b.x << " " << x.x << " " << x.y << " " << y.x << " " << y.y << "\n";
-      cout << "here now\n";
-    }
+  
     return true;
   }
 
@@ -87,9 +84,7 @@ bool isCollidingWithObstacle(floatPoint x, floatPoint y, floatPoint z, vector<Tr
   struct Triangle1 triangle1 = {x, y, z};
   for (int i=0; i<noOfObstacles; i++){
     Triangle1 obstacle =  obstacles[i];
-    if (x.x == 3 && x.y == 7 && y.x == 5 && y.y == 7 && z.x == 4 && z.y == 5){
-      cout << "here\n";
-    }
+    
     if (doIntersect(triangle1.x, triangle1.y, obstacle.x, obstacle.y)) return true;
     if (doIntersect(triangle1.x, triangle1.y, obstacle.x, obstacle.z)) return true;
     if (doIntersect(triangle1.x, triangle1.y, obstacle.y, obstacle.z)) return true;
@@ -120,7 +115,7 @@ bool isCollidingWithObstacle(floatPoint x, floatPoint y, floatPoint z, vector<Tr
   return false;
 }
 
-bool isValid(int grid[][5][4],int x, int y, int z, int gridLength, int degrees){
+bool isValid(int grid[][100][36],int x, int y, int z, int gridLength, int degrees){
 
     int size1 = gridLength;
     int size2 = gridLength;
@@ -131,7 +126,7 @@ bool isValid(int grid[][5][4],int x, int y, int z, int gridLength, int degrees){
     return false;
 }
 
-queueNode BFS(int grid[][5][4], Cell src, Cell dest, int gridSize, int degrees, int cellSize){
+queueNode BFS(int grid[][100][36], Cell src, Cell dest, int gridSize, int degrees, int cellSize){
 
     if(!isValid(grid, src.x, src.y, src.z, gridSize, degrees ) || !isValid(grid, dest.x, dest.y, dest.z ,gridSize, degrees)){
       struct queueNode node = {src, -1};

@@ -34,5 +34,5 @@ bool doIntersect(floatPoint a, floatPoint b, floatPoint x, floatPoint y);
 bool pointInTriangle(floatPoint x, floatPoint a, floatPoint b, floatPoint c);
 bool isCollidingWithBoundary(floatPoint a, floatPoint b, floatPoint c, int gridSize);
 bool isCollidingWithObstacle(floatPoint x, floatPoint y, floatPoint z, vector<Triangle1> obstacles, int noOfObstacles);
-queueNode BFS(int grid[5][5][4], Cell src, Cell dest, int gridSize, int deg, int cellSize);
+queueNode BFS(int grid[100][100][36], Cell src, Cell dest, int gridSize, int deg, int cellSize);
 #endif
