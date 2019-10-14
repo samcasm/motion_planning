@@ -20,3 +20,5 @@ OUTPUT:
 2. The red polygons are the obstacles
 
 3. The robot manuvers the obstacles and reaches the destination which is a yellow polygon with no green outline.
+
+<img src="output_snap.png" />
