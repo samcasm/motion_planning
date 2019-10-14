@@ -229,29 +229,31 @@ int main(int argc, char **argv)
       for (int k = 0; k < degrees; k++)
       {
         // change as per the degrees
-        int deg = 90 * k;
 
         /* compute projection of rotation and translation */
-        temp1 = rotate_trans_Point1(origin1, cellSize, j, i, deg);
+        temp1 = rotate_trans_Point1(origin1, cellSize, j, i, k);
 
-        temp2 = rotate_trans_Point1(origin2, cellSize, j ,i, deg);
+        temp2 = rotate_trans_Point1(origin2, cellSize, j ,i, k);
 
-        temp3 = rotate_trans_Point1(origin3, cellSize, j ,i, deg);
+        temp3 = rotate_trans_Point1(origin3, cellSize, j ,i, k);
         
         /* check bounding condition */
         if (isCollidingWithBoundary(temp1, temp2, temp3, gridSize * cellSize))
         {
-          freeSpace[i][j][k] = 0;
+          freeSpace[j][i][k] = 0;
         }
         /* check obstacle collision */
         else if (isCollidingWithObstacle(temp1, temp2, temp3, obstacles, noOfObstacles))
         { 
-          cout << "\n" << temp1.x << " " << temp1.y << " " << temp2.x << " " << temp2.y << " " << temp3.x << " " << temp3.y << " colliding points\n";
+          // if (i == 3 && j == 2 && k == 2){
+          // cout << "\n" << temp1.x << " " << temp1.y << " " << temp2.x << " " << temp2.y << " " << temp3.x << " " << temp3.y << " colliding points\n";
+
+          // }
           
-          freeSpace[i][j][k] = 7;
+          freeSpace[j][i][k] = 0;
         }
         else{
-          freeSpace[i][j][k] = 1;
+          freeSpace[j][i][k] = 1;
         }
         
 
@@ -262,6 +264,7 @@ int main(int argc, char **argv)
     }
   }
 
+  cout << freeSpace[2][3][2] << "< ---";
   
   // floatPoint resres = rotate_trans_Point1(origin1, cellSize, 1, 1, 90);
   // cout << origin1.x << " " << origin1.y ;
@@ -411,23 +414,31 @@ int main(int argc, char **argv)
 
       createRobot(vx[0],vy[0],vx[1], vy[1], vx[2], vy[2], startx, starty, gridSize, cellSize);
 
-       for (int i = 0; i < gridSize; i++)
-        {
-          for (int j = 0; j < gridSize; j++)
-          {
-            for (int k = 0; k < degrees; k++)
-            {
-              if( freeSpace[i][j][k] == 7){
-                floatPoint p1 = rotate_trans_Point1(origin1, cellSize, j, i, k );
-                floatPoint p2 = rotate_trans_Point1(origin2, cellSize, j, i, k );
-                floatPoint p3 = rotate_trans_Point1(origin3, cellSize, j, i, k );
-                createTriangles1(p1,p2,p3, gridSize*cellSize);
+      //  for (int i = 0; i < gridSize; i++)
+      //   {
+      //     for (int j = 0; j < gridSize; j++)
+      //     {
+      //       for (int k = 0; k < degrees; k++)
+      //       {
+      //         if( freeSpace[i][j][k] == 0){
+      //           floatPoint p1 = rotate_trans_Point1(origin1, cellSize, j, i, k );
+      //           floatPoint p2 = rotate_trans_Point1(origin2, cellSize, j, i, k );
+      //           floatPoint p3 = rotate_trans_Point1(origin3, cellSize, j, i, k );
+      //           createTriangles1(p1,p2,p3, gridSize*cellSize);
 
-              }
+      //         }
 
-            }
-          }
-        }
+      //       }
+      //     }
+      //   }
+
+      // if(freeSpace[2][3][2] == 7){
+      //   floatPoint p1 = rotate_trans_Point1(origin1, cellSize, 3, 2, 2 );
+      //   floatPoint p2 = rotate_trans_Point1(origin2, cellSize, 3, 2, 2 );
+      //   floatPoint p3 = rotate_trans_Point1(origin3, cellSize, 3, 2, 2 );
+      //   cout << "nooooo" ;
+      //   createTriangles1(p1,p2,p3, gridSize*cellSize);
+      // }
 
       for (int i = 0; i < resultsize; i++){
         floatPoint a1 = rotate_trans_Point1(origin1, cellSize, result.pathVector[i].x, result.pathVector[i].y, result.pathVector[i].z);

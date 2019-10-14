@@ -34,7 +34,6 @@ int orientation(floatPoint a, floatPoint b, floatPoint c){
 /* Primitives */
 /* intersection function */
 bool doIntersect(floatPoint a, floatPoint b, floatPoint x, floatPoint y){
-
   /* Case 1: when (a,b,x) and (a,b,y) have different orientations and 
              when (x,y,a) and (x,y,b) have different orientation */
   int or1 = orientation(a,b,x);
@@ -43,11 +42,15 @@ bool doIntersect(floatPoint a, floatPoint b, floatPoint x, floatPoint y){
   int or4 = orientation(x,y,b);
 
   if (or1 != or2 && or3 != or4){
+  if (a.x == 3 && a.y == 7 && b.x == 5 && b.y == 7){
+      cout << a.x << " " << a.y << " " << b.x << " " << b.x << " " << x.x << " " << x.y << " " << y.x << " " << y.y << "\n";
+      cout << "here now\n";
+    }
     return true;
   }
 
   /*Case 2: when points a,b,x are colinear and point x lies on segment ab */
-  if((or1 == 0 && pointOnSegment(a,x,b)) or (or2 == 0 && pointOnSegment(a,y,b)) or (or3 == 0 && pointOnSegment(x,a,y)) or (or4 && pointOnSegment(x,b,y))){
+  if((or1 == 0 && pointOnSegment(a,x,b)) or (or2 == 0 && pointOnSegment(a,y,b)) or (or3 == 0 && pointOnSegment(x,a,y)) or (or4 == 0 && pointOnSegment(x,b,y))){
     return true;
   }
 
@@ -84,9 +87,9 @@ bool isCollidingWithObstacle(floatPoint x, floatPoint y, floatPoint z, vector<Tr
   struct Triangle1 triangle1 = {x, y, z};
   for (int i=0; i<noOfObstacles; i++){
     Triangle1 obstacle =  obstacles[i];
-    // if (triangle1.x.x > 445 && triangle1.x.y < 453){
-    //   cout << obstacle.x.x << obstacle.x.y;
-    // } 
+    if (x.x == 3 && x.y == 7 && y.x == 5 && y.y == 7 && z.x == 4 && z.y == 5){
+      cout << "here\n";
+    }
     if (doIntersect(triangle1.x, triangle1.y, obstacle.x, obstacle.y)) return true;
     if (doIntersect(triangle1.x, triangle1.y, obstacle.x, obstacle.z)) return true;
     if (doIntersect(triangle1.x, triangle1.y, obstacle.y, obstacle.z)) return true;
@@ -177,6 +180,9 @@ queueNode BFS(int grid[][5][4], Cell src, Cell dest, int gridSize, int degrees, 
               
             // if adjacent cell is valid, has path and 
             // not visited yet, enqueue it. 
+            // if (isValid(grid, row, col, deg, gridSize, degrees)){
+
+            // }
             if (isValid(grid, row, col, deg, gridSize, degrees) && grid[row][col][deg] &&  
                !visited[row][col][deg]) 
             { 
